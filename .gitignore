@@ -23,3 +23,7 @@ generated/
 /.classpath
 /.project
 
+/docs-generated
+/dist
+/build
+/logs

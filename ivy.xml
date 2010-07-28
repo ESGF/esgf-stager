@@ -61,13 +61,20 @@ Note: Check Maven for propery dependency parameter values @
                       "http://ant.apache.org/ivy/schemas/ivy.xsd">
   <info organisation="esgf" module="esg-stager"/>
   <dependencies>
+    <dependency org="org.apache.tomcat" name="servlet-api" rev="6.0.29"/>
+    
+    
     <dependency org="commons-logging" name="commons-logging" rev="1.1.1"/>
     <dependency org="log4j" name="log4j" rev="1.2.14">
       <exclude org="com.sun.jdmk"/>
       <exclude org="com.sun.jmx"/>
       <exclude org="javax.jms"/>
     </dependency>
+    
+    
     <dependency org="junit" name="junit" rev="4.8.1"/>
+    <dependency org="cobertura" name="cobertura" rev="1.8"/>
+    
     <dependency org="com.sun.xml.bind" name="jaxb-xjc" rev="2.2"/>
 <!--<dependency org="com.caucho" name="hessian" rev="3.1.5"/> -->
   </dependencies>
