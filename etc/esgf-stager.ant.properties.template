@@ -56,19 +56,4 @@
 #*
 #***************************************************************************
 
-#Ant Build Properties for the esgf stager project
-version_num=0.0.1
-release_name=none
-build.compiler.emacs=false
-build.compiler=javac1.6
-
-#directories and file corrections
-log_dir=logs
-java_src_dir=/scratch/local1/k204198/opt/jdk1.6.0_20/src
-
-
-#web server for deploying doc artifact 
-web.user=k204198
-web.server=cmip2
-web.dir=/usr/local/tomcat/webapps/development
 

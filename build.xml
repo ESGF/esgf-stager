@@ -166,7 +166,7 @@ Builds the project via ant (obviously).
 			<path refid="main_classpath" />
 			<pathelement location="${test_build_dir}" />
 		</path>
-		<taskdef classpath="lib/cobertura.jar" resource="tasks.properties" classpathref="coverage.classpath" />
+		<taskdef resource="tasks.properties" classpathref="coverage.classpath" />
 
 		<echo message="--------------------------------" />
 		<echo message="module            = ${module} " />
