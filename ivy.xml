@@ -73,7 +73,8 @@ Note: Check Maven for propery dependency parameter values @
     
     
     <dependency org="junit" name="junit" rev="4.8.1"/>
-    <dependency org="cobertura" name="cobertura" rev="1.8"/>
+    <dependency org="net.sourceforge.cobertura" name="cobertura" rev="1.9.4"/>
+
     
     <dependency org="com.sun.xml.bind" name="jaxb-xjc" rev="2.2"/>
 <!--<dependency org="com.caucho" name="hessian" rev="3.1.5"/> -->

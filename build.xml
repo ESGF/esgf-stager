@@ -161,13 +161,6 @@ Builds the project via ant (obviously).
 		<property name="test_last_failed_file" location="${build_dir}/.lasttestsfailed" />
 		<property name="ivy.lib.dir" value="${lib_fetched_dir}" />
 
-		<path id="coverage.classpath">
-			<fileset dir="${lib_dir}" includes="**/*.jar" />
-			<path refid="main_classpath" />
-			<pathelement location="${test_build_dir}" />
-		</path>
-		<taskdef resource="tasks.properties" classpathref="coverage.classpath" />
-
 		<echo message="--------------------------------" />
 		<echo message="module            = ${module} " />
 		<echo message="version_num       = ${version_num} " />
@@ -536,6 +529,13 @@ Builds the project via ant (obviously).
 		<delete dir="${test_coverage_dir}" />
 		<mkdir dir="${test_coverage_dir}" />
 		
+		<path id="coverage.classpath">
+			<fileset dir="${lib_dir}" includes="**/*.jar" />
+			<path refid="main_classpath" />
+			<pathelement location="${test_build_dir}" />
+		</path>
+		<taskdef resource="tasks.properties" classpathref="coverage.classpath" />
+		
 		<!-- instrument test classes -->
 		<cobertura-instrument todir="${test_build_dir_inst}">
 			<fileset dir="${build_dir}/esgf">
@@ -569,6 +569,7 @@ Builds the project via ant (obviously).
 
 		<!-- coverage report -->
 		<cobertura-report srcdir="${src_dir}" destdir="${test_coverage_dir}" />
+		<cobertura-report format="xml" srcdir="${src_dir}" destdir="${test_coverage_dir}/xml" />
 
 		<echo message="last build failed tests" file="${test_last_failed_file}" />
 		<fail if="failed" message="Unit tests failed.  Check log or reports for details" />
