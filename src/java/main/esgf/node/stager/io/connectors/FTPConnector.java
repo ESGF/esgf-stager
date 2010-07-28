@@ -32,6 +32,11 @@ public class FTPConnector implements RemoteConnector {
 	private String serverUserName;
 	private String serverUserPass;
 
+	/**
+	 * Creates the connector with the given properties.
+	 * @param config properties for setting up the connector.
+	 * @throws StagerException if the setup fails.
+	 */
 	public FTPConnector(ExtendedProperties config) throws StagerException {
 		// to simplify parameter check
 		if (config == null) config = new ExtendedProperties();
@@ -92,7 +97,7 @@ public class FTPConnector implements RemoteConnector {
 			} else {
 				se.printStackTrace();
 				throw new StagerException(
-						StagerException.Code.PERMANENT_FAIL,
+						StagerException.Code.PERMANENT_FAILURE,
 						String.format("Could not access FTP server."
 								+ " target %s (filename %s)", file.getTarget(),
 								filename));
@@ -100,7 +105,7 @@ public class FTPConnector implements RemoteConnector {
 
 		} catch (IOException se) {
 			se.printStackTrace();
-			throw new StagerException(StagerException.Code.PERMANENT_FAIL,
+			throw new StagerException(StagerException.Code.PERMANENT_FAILURE,
 					String.format("Could not access HPSS. target %s "
 							+ "(filename %s)", file.getTarget(), filename));
 		} finally {
@@ -113,18 +118,31 @@ public class FTPConnector implements RemoteConnector {
 	
 
 	/**
+	 * Returns the name of the FTP server.
 	 * @return the serverName
 	 */
 	public String getServerName() {
 		return serverName;
 	}
 	/**
-	 * @return the serverName
+	 * Returns the port of the FTP server.
+	 * @return the serverPort
 	 */
 	public int getServerPort() {
 		return serverPort;
 	}
+
 	/**
+	 * Return the root dir of the FTP server to which all targets are going to
+	 * be understood. For example:
+	 * <p>
+	 * serverRootDir=/pub/files target=/my_path/my_file (or even without the
+	 * first slash)
+	 * </p>
+	 * Resolves in the file located at /pub/files/my_path/my_file. No file
+	 * outside {@link #serverRootDir} can be accessed (but this doesn't imply it
+	 * could still be referenced from a link within this path)
+	 * 
 	 * @return the serverRootDir
 	 */
 	public String getServerRootDir() {
@@ -132,6 +150,7 @@ public class FTPConnector implements RemoteConnector {
 	}
 
 	/**
+	 * Return the user name used for connecting to the FTP server.
 	 * @return the serverUserName
 	 */
 	public String getServerUserName() {
@@ -139,6 +158,9 @@ public class FTPConnector implements RemoteConnector {
 	}
 
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void retrieveFile(RemoteFile source, File target)
 			throws StagerException {
 		FTPClient client = null;

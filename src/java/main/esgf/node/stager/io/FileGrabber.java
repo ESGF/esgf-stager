@@ -31,7 +31,7 @@ public class FileGrabber {
 	
 	
 	/**
-	 * Encapsulates the call to be performed when we have finished retrieving the file.
+	 * Encapsulates the call to be performed when finished retrieving the file.
 	 */
 	public static interface Callback {
 		/**
@@ -76,8 +76,11 @@ public class FileGrabber {
 	private RemoteConnectorFactory remoteConnectorFactory;
 	
 	/**
-	 * Creates a HPSSGrabber which is able to retrieve files from the HPSS server upon request.
-	 * @param config configuration parameters encapsulated in a Properties object.
+	 * Creates a HPSSGrabber which is able to retrieve files from the HPSS
+	 * server upon request.
+	 * 
+	 * @param config configuration parameters encapsulated in a Properties
+	 *            object.
 	 * @throws StagerException if HPSS configuration fails.
 	 */
 	public FileGrabber (ExtendedProperties config) throws StagerException {
@@ -118,8 +121,9 @@ public class FileGrabber {
 	}
 	
 	/**
-	 * @param force
-	 *            if the stop should also stop running threads (this might
+	 * Stops the file grabbing service, i.e. running threads and threads' pools.
+	 * 
+	 * @param force if the stop should also stop running threads (this might
 	 *            corrupt data in cache!)
 	 */
 	public void terminate(boolean force) {
@@ -128,15 +132,15 @@ public class FileGrabber {
 		} else {
 			poolExecutor.shutdown();
 		}
-		LOG.info("HPSS Grabber Terminated.");
+		LOG.info("File Grabber Terminated.");
 	}
 	
-	
-	
 	/**
+	 * Retrieve information on the target file.
+	 * 
 	 * @param target the path to the target file
-	 * @return the representation of a file at the hpss server
-	 * @throws IOException if the file cannot be retrieven 
+	 * @return the representation of a file at the remote server
+	 * @throws IOException if the file cannot be retrieven
 	 */
 	public RemoteFile getFileInfo(String target) throws IOException {
 		
@@ -150,39 +154,38 @@ public class FileGrabber {
 	/**
 	 * Schedule the retrieval of a file but don't wait for it to happen.
 	 * 
-	 * @param hpssDirectory
-	 *            path to the target file in the HPSS
-	 * @param hpssFilename
-	 *            name of the target file in the HPSS
+	 * @param remoteFile
+	 *            file description point to the remote one.
 	 * @param localFile
 	 *            local file file which will hold the information.
 	 * @param callback
 	 *            if provided it will be called upon completion.
 	 */
-	public void grabLater(RemoteFile hpssFile,
+	public void grabLater(RemoteFile remoteFile,
 			File localFile, Callback callback) {
-		poolExecutor.execute(makeTask(new Job(hpssFile,
+		poolExecutor.execute(makeTask(new Job(remoteFile,
 				localFile, callback)));
 	}
 
 	/**
 	 * Schedule the retrieval of a file and wait until it is finished.
 	 * 
-	 * @param hpssDirectory
-	 *            path to the target file in the HPSS
-	 * @param hpssFilename
-	 *            name of the target file in the
+	 * @param remoteFile
+	 *            file description point to the remote one.
 	 * @param localFile
 	 *            local file file which will hold the information.
 	 */
-	public void grabAndWait(RemoteFile hpssFile,
+	public void grabAndWait(RemoteFile remoteFile,
 			File localFile) throws InterruptedException, ExecutionException {
-		Future<?> f = poolExecutor.submit(makeTask(new Job(hpssFile, localFile, null)));
+		Future<?> f = poolExecutor.submit(makeTask(new Job(remoteFile, localFile, null)));
 		f.get();
 	}
 	
 	/**
-	 * @param j Information for a particular Job (i.e., HPSS target and local file where to safe the retrieved data to)
+	 * Encapsulates the retrieval in a Runnable object.
+	 * 
+	 * @param j Information for a particular Job (i.e., HPSS target and local
+	 *            file where to safe the retrieved data to)
 	 * @return a runnable that grabs the data from the HPSS
 	 */
 	private Runnable makeTask(final Job j) {

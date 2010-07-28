@@ -18,7 +18,9 @@ import org.apache.log4j.Logger;
 import esgf.node.stager.utils.ExtendedProperties;
 
 /**
- * Servlet implementation class HPSSLoader
+ * Servlet implementation for the stager. This implementation was abandoned and
+ * might not be working properly anymore. It is still conserved as it might be
+ * required in the future.
  */
 public class StagerServlet extends HttpServlet {
 	private static final Logger LOG = Logger.getLogger(StagerServlet.class);
@@ -36,8 +38,8 @@ public class StagerServlet extends HttpServlet {
         super();
     }
 
-	/* (non-Javadoc)
-	 * @see javax.servlet.GenericServlet#init(javax.servlet.ServletConfig)
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void init(ServletConfig config) throws ServletException {
@@ -83,8 +85,8 @@ public class StagerServlet extends HttpServlet {
 	}
 
 	
-	/* (non-Javadoc)
-	 * @see javax.servlet.GenericServlet#destroy()
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void destroy() {
@@ -93,8 +95,8 @@ public class StagerServlet extends HttpServlet {
 		stager.terminate(false);
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -130,7 +132,7 @@ public class StagerServlet extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * {@inheritDoc}
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);

@@ -22,10 +22,9 @@ import org.apache.log4j.Logger;
 import esgf.node.stager.utils.ExtendedProperties;
 
 /**
- * Stage files being accessed from the HPSS
+ * Stage files from the remote system while being accessed.
  * 
  * @author Estanislao Gonzalez
- * 
  */
 public class StagerFilter implements Filter {
 	private static final Logger LOG = Logger.getLogger(StagerFilter.class);
@@ -43,6 +42,9 @@ public class StagerFilter implements Filter {
 		LOG.info("Filter destroyed");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res,
 			FilterChain chain) throws IOException, ServletException {
@@ -100,11 +102,10 @@ public class StagerFilter implements Filter {
 	}
 
 	/**
-	 * Checks if the current file is being held at an HPSS storage
+	 * Checks if the current file is being held at the remote system.
 	 * 
-	 * @param fileName
-	 *            the filename to check (DRS structure in case of CMIP5, i.e.
-	 *            path and filename)
+	 * @param fileName the filename to check (DRS structure in case of CMIP5,
+	 *            i.e. path and filename)
 	 * @return if this file is being staged
 	 */
 	private boolean isStaged(String fileName) {
@@ -115,6 +116,9 @@ public class StagerFilter implements Filter {
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void init(FilterConfig config) throws ServletException {
 

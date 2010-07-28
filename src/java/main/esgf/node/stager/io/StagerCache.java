@@ -195,6 +195,8 @@ public class StagerCache {
 	private FileGrabber fileGrabber;
 
 	/**
+	 * Creates the stager with the passed properties.
+	 * 
 	 * @param props configuration map for Stager and access.
 	 * @throws StagerException if Stager cannot be properly setup.
 	 */
@@ -298,14 +300,25 @@ public class StagerCache {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Signals the termination of this cache. In this implementation the cash
+	 * is not being flush to avoid loosing it contents as it can re-serve
+	 * the existing files after restarted.
+	 * 
+	 * @param force if the termination should happen abruptly.
 	 */
 	public void terminate(boolean force) {
 		fileGrabber.terminate(force);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Retrieves a staged file. If the file is not cached (cache-miss) it will
+	 * be retrieved from the staged remote storage, which might take time.
+	 * 
+	 * @param origTarget the target pointing to the file in the remote system
+	 * @param blocking if the retrieval should block until the file is available
+	 * @return the retrieved File or null if called in non-blocking modus and a
+	 *         cache-miss happens.
+	 * @throws IOException if the retrieval fails.
 	 */
 	public File retrieveFile(String origTarget, boolean blocking)
 			throws IOException {
@@ -366,7 +379,7 @@ public class StagerCache {
 						.getDirectory());
 				if (!dirStruct.exists()) {
 					if (!dirStruct.mkdirs()) throw new StagerException(
-							Code.PERMANENT_FAIL,
+							Code.PERMANENT_FAILURE,
 							"Could not create directory structure at local host.");
 				}
 
@@ -409,7 +422,7 @@ public class StagerCache {
 								cachedFilesSize, maxCacheSize, cache.size(),
 								maxCacheFiles));
 						// We should signal the failure properly
-						throw new StagerException(Code.TEMPORARY_FAIL,
+						throw new StagerException(Code.TEMPORARY_FAILURE,
 								"Not enough room for file, try again later.");
 					}
 
@@ -473,7 +486,7 @@ public class StagerCache {
 	}
 
 	/**
-	 * Assure we have a canonize string to avoid caching a file more than once
+	 * Assure we have a canonized string to avoid caching a file more than once
 	 * and preventing injections which might allow to retrieve files other than
 	 * from the intended directory and sub directories.
 	 * 
@@ -519,7 +532,10 @@ public class StagerCache {
 	}
 
 	/**
+	 * Tries to allocate enough space.
+	 * 
 	 * @param size size required in cache
+	 * @return if the allocation succeeded.
 	 */
 	private boolean allocate(long size) {
 		synchronized (cache) {
@@ -583,6 +599,9 @@ public class StagerCache {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return String.format("Stager Cache holding: %d files in %d bytes.", cache

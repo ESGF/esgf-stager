@@ -9,9 +9,10 @@ import java.lang.reflect.Modifier;
  * Provides access to private fields, classes & methods. This should only be
  * used for testing and output routines that are not part of normal operation
  * and which might imply changing the visibility of the original
- * methods/attributes for this solely purpose.
+ * methods/attributes for this solely purpose. A minimal SecurityContext will
+ * inhibit this class from working properly.
  * 
- * @author estani
+ * @author Estanislao Gonzalez
  */
 public final class PrivilegedAccessor {
 	private PrivilegedAccessor() {
@@ -45,10 +46,11 @@ public final class PrivilegedAccessor {
 	}
 	
 	/**
-	 * @param source
-	 *            object whose filed will be grabbed.
-	 * @param fieldName
-	 *            name of the field
+	 * Returns a private field from an instance or class if it's declared
+	 * static.
+	 * 
+	 * @param source object whose filed will be grabbed.
+	 * @param fieldName name of the field
 	 * @return the field object
 	 */
 	public static Object getField(Object source, String fieldName) {
@@ -63,20 +65,16 @@ public final class PrivilegedAccessor {
 			f.setAccessible(true);
 			return f.get(source);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-
-		return null;
 	}
 
 	/**
-	 * @param source
-	 *            object whose filed will be grabbed.
-	 * @param fieldName
-	 *            name of the field
-	 * @param value
-	 *            the value this field is going to have afterwards.
+	 * Alters the value of a private field.
+	 * 
+	 * @param source object whose filed will be grabbed.
+	 * @param fieldName name of the field
+	 * @param value the value this field is going to have afterwards.
 	 */
 	public static void setField(Object source, String fieldName, Object value) {
 		try {
@@ -105,16 +103,15 @@ public final class PrivilegedAccessor {
 			}
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
 	/**
-	 * @param source
-	 *            object to get an internal class from.
-	 * @param className
-	 *            name of the internal class
+	 * Retrieves an internal private class.
+	 * 
+	 * @param source object to get an internal class from.
+	 * @param className name of the internal class
 	 * @return the class object
 	 */
 	public static Class<?> getInternalClass(Object source, String className) {
@@ -135,23 +132,37 @@ public final class PrivilegedAccessor {
 					return classes[i];
 				}
 			}
+			throw new IllegalArgumentException("Class not found: " + className);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 
-		throw new IllegalArgumentException("Class not found: " + className);
 	}
-
+	
 	/**
-	 * Call a method.
+	 * Instantiate a private internal class.
+	 * @param sourceClass Class object to instantiate
+	 * @param params parameters for the constructor
+	 * @return a new instance.
+	 */
+	public static Object instantiate(Class<?> sourceClass, Object... params) {
+		try {
+			Class<?>[] classes = expandClasses(params);
+
+			Constructor<?> c = sourceClass.getDeclaredConstructor(classes);
+			c.setAccessible(true);
+			return c.newInstance(params);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 * Call a private method.
 	 * 
-	 * @param source
-	 *            source object (might be a Class object)
-	 * @param methodName
-	 *            name of method to invoke
-	 * @param params
-	 *            parameters for the call (might be empty)
+	 * @param source source object (might be a Class object)
+	 * @param methodName name of method to invoke
+	 * @param params parameters for the call (might be empty)
 	 * @return the resulting Object or null if it was void (while returning a
 	 *         primitive it will get encapsulated into an Object)
 	 */
@@ -170,31 +181,7 @@ public final class PrivilegedAccessor {
 			m.setAccessible(true);
 			return m.invoke(source, params);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-
-		return null;
-	}
-	
-	/**
-	 * @param sourceClass Class object to instantiate
-	 * @param params parameters for the constructor
-	 * @return a new instance.
-	 */
-	public static Object instantiate(Class<?> sourceClass, Object... params) {
-		try {
-			Class<?>[] classes = expandClasses(params);
-
-			Constructor<?> c = sourceClass.getDeclaredConstructor(classes);
-			c.setAccessible(true);
-			return c.newInstance(params);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return null;
-		
 	}
 }

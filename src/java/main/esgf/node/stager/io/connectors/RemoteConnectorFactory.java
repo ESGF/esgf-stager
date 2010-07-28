@@ -13,7 +13,8 @@ import esgf.node.stager.utils.ExtendedProperties;
 public interface RemoteConnectorFactory {
 
 	/**
-	 * @param config configuration parameters
+	 * Retrieves a RemoteConnector instance.
+	 * 
 	 * @return a properly initialized remote connector
 	 * @throws StagerException if the initialization fails
 	 */

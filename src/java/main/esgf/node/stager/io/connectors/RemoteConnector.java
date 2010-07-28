@@ -14,6 +14,8 @@ import esgf.node.stager.io.StagerException;
 public interface RemoteConnector {
 
 	/**
+	 * Retrieves information on the remote file.
+	 * 
 	 * @param file file descriptor to be completed (must have target filed set
 	 *            though)
 	 * @throws IOException if access fails.
@@ -21,6 +23,8 @@ public interface RemoteConnector {
 	void completeDataInfo(RemoteFile file) throws IOException;
 
 	/**
+	 * Retrieves the remote file at the given location.
+	 * 
 	 * @param source remote file descriptor
 	 * @param target target local file
 	 * @throws StagerException to signal the retrieval has failed.

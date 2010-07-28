@@ -4,10 +4,9 @@ import java.util.Date;
 
 /**
  * Representation of a file at a remote server.
- * 
- * <pre>
- * Note: Only forward slashes are
- * supported.
+ * <p>
+ * <b>Note</b>: Only forward slashes are supported.
+ * </p>
  * @author Estanislao Gonzalez
  */
 public class RemoteFile {
@@ -19,6 +18,7 @@ public class RemoteFile {
 	private boolean exists = false;
 
 	/**
+	 * Create an object from a given remote system target (path) string.
 	 * @param target path to target file in Remote System. Path separator must
 	 *            be forward slashes.
 	 */
@@ -73,6 +73,7 @@ public class RemoteFile {
 	}
 
 	/**
+	 * Equals directory + '/' + filename
 	 * @return the target
 	 */
 	public String getTarget() {
@@ -80,6 +81,7 @@ public class RemoteFile {
 	}
 
 	/**
+	 * Returns only the directory part of target.
 	 * @return the directory
 	 */
 	public String getDirectory() {
@@ -87,6 +89,7 @@ public class RemoteFile {
 	}
 
 	/**
+	 * Returns only the filename of target.
 	 * @return the filename
 	 */
 	public String getFilename() {
@@ -94,6 +97,7 @@ public class RemoteFile {
 	}
 
 	/**
+	 * The size in Bytes of the remote file (if known). -1 if unknown.
 	 * @return the size
 	 */
 	public long getSize() {
@@ -101,6 +105,7 @@ public class RemoteFile {
 	}
 
 	/**
+	 * The last modification time of the file (if knwon). Null if unknown.
 	 * @return the lastMod
 	 */
 	public Date getLastMod() {
@@ -108,16 +113,10 @@ public class RemoteFile {
 	}
 
 	/**
-	 * @return if this file exists on the HPSS server
+	 * file existence on the remote server.
+	 * @return if this file exists on the remote server
 	 */
 	public boolean exists() {
-		return exists;
-	}
-
-	/**
-	 * @return the exists
-	 */
-	public boolean isExists() {
 		return exists;
 	}
 

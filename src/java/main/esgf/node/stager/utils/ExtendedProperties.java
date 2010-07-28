@@ -13,7 +13,9 @@ import esgf.node.stager.io.StagerException;
 
 /**
  * Extends the normal property class to allow:
- * - retrieve checkd property (throws exception if not checked)
+ * <ul>
+ * <li>retrieve checked property (throws exception if not checked)</li>
+ * </ul>
  * @author Estanislao Gonzalez
  *
  */
@@ -22,6 +24,9 @@ public class ExtendedProperties extends Properties {
 	
 	private static final Logger LOG = Logger.getLogger(ExtendedProperties.class);
 	
+	/**
+	 * Creates an empty property object.
+	 */
 	public ExtendedProperties() {
 		super();
 	}
@@ -54,7 +59,7 @@ public class ExtendedProperties extends Properties {
 	
 	/**
 	 * Load properties from given file
-	 * @param f file to load properties from
+	 * @param fileName file to load properties from
 	 * @throws IOException Cannot access file
 	 * @throws FileNotFoundException File not found
 	 */
@@ -79,9 +84,15 @@ public class ExtendedProperties extends Properties {
 	}
 	
 	/**
-	 * @param props properties object
+	 * Gets a property or its default value if no property was found. If the
+	 * property wasn't found and no default value was provided an exception will
+	 * be thrown. This call is being logged, if you don't wan't the logg system
+	 * to log it use {@link #getCheckedProperty(boolean, String, Object...)}
+	 * instead.
+	 * 
 	 * @param name name of the property to retrieve
-	 * @param defValue default value to return if property is missing (not required)
+	 * @param defValue default value to return if property is missing (not
+	 *            required)
 	 * @return the property if present, defValue if the property wasn't found.
 	 * @throws StagerException If both property and default value are missing.
 	 */
@@ -91,10 +102,14 @@ public class ExtendedProperties extends Properties {
 	}
 	
 	/**
+	 * * Gets a property or its default value if no property was found. If the
+	 * property wasn't found and no default value was provided an exception will
+	 * be thrown.
+	 * 
 	 * @param logFound if we should log the case where the parameter is found.
-	 * @param props properties object
 	 * @param name name of the property to retrieve
-	 * @param defValue default value to return if property is missing (not required)
+	 * @param defValue default value to return if property is missing (not
+	 *            required)
 	 * @return the property if present, defValue if the property wasn't found.
 	 * @throws StagerException If both property and default value are missing.
 	 */

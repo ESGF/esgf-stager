@@ -343,7 +343,7 @@ public class TestStagerCache {
 			cache.retrieveFile(hpssFile2.getTarget(), true);
 			fail("Shouldn't have been able to allocate it!");
 		} catch (StagerException e) {
-			assertEquals(StagerException.Code.TEMPORARY_FAIL, e.getErrorCode());
+			assertEquals(StagerException.Code.TEMPORARY_FAILURE, e.getErrorCode());
 		}
 		
 		//block until first file arrives

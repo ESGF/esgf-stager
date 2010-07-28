@@ -16,15 +16,16 @@ import esgf.node.stager.io.StagerException;
 import esgf.node.stager.utils.ExtendedProperties;
 
 /**
- * Encapsulates the HPSS Stager that can be used as servlet or as filter.
+ * Encapsulates the Stager access so it can be used either as servlet or as
+ * filter (or both).
  * 
  * @author Estanislao Gonzalez
- * 
  */
 public class StagerDispatcher {
 
 	/**
-	 * This data will be added to the session.
+	 * This data will be added to the session to keep track while waiting for
+	 * a file to arrive.
 	 * 
 	 * @author Estanislao Gonzalez
 	 * 
@@ -34,13 +35,17 @@ public class StagerDispatcher {
 		private String redirectedTo;
 
 		/**
-		 * @return the redirectedFrom
+		 * Get the source page from which we got redirected.
+		 * 
+		 * @return the url string
 		 */
 		public String getRedirectedFrom() {
 			return redirectedFrom;
 		}
 
 		/**
+		 * Get the target page to which we will get redirected.
+		 * 
 		 * @return the redirectedTo
 		 */
 		public String getRedirectedTo() {
@@ -59,17 +64,14 @@ public class StagerDispatcher {
 	private final boolean dryrun;
 
 	/**
-	 * Creates a stager with the information provided in the properties
+	 * Creates a stager with the information provided in the properties.
 	 * 
-	 * @param props
-	 *            properties for setting up the stager and the underlying
+	 * @param props properties for setting up the stager and the underlying
 	 *            objects (cache, etc)
-	 * @throws StagerException
-	 *             In case required configuration entries are missing
+	 * @throws StagerException In case required configuration entries are
+	 *             missing
 	 */
 	public StagerDispatcher(ExtendedProperties props) throws StagerException {
-
-
 		// try to set the cache.
 		try {
 			cache = new StagerCache(props);
@@ -90,29 +92,25 @@ public class StagerDispatcher {
 	}
 
 	/**
-	 * Retrieves a file from HPSS into the cache and returns. If the file is
-	 * already cached the call will return immediately. The call can wait until
-	 * the file is in the cache (blocking in case of non-interactive client) or
-	 * return immediately after scheduling its retrieval (non-blocking in case
-	 * of interactive client). This differentiation is performed by analyzing
-	 * the user-agent http header field.
+	 * Retrieves a file from the staged system into the cache and returns. If
+	 * the file is already cached the call will return immediately. The call can
+	 * wait until the file is in the cache (blocking in case of non-interactive
+	 * client) or return immediately after scheduling its retrieval
+	 * (non-blocking in case of interactive client). This differentiation is
+	 * performed by analyzing the user-agent http header field.
 	 * 
-	 * @param hpssTarget
-	 *            target file to stage
-	 * @param request
-	 *            the HTTP request. Used for checking User-agent and accessing
-	 *            the client session.
-	 * @param response
-	 *            for redirecting the user in case of cache-miss and the
+	 * @param fileTarget target file to stage
+	 * @param request the HTTP request. Used for checking User-agent and
+	 *            accessing the client session.
+	 * @param response for redirecting the user in case of cache-miss and the
 	 *            retrieval was triggered in non-blocking mode.
 	 * @return The retrieved file or null if file is missing and retrieval
 	 *         triggered in non-blocking mode.
-	 * @throws IOException
-	 *             in case of any IO error (cache full, etc). Normal HPSS errors
-	 *             (Missing file, hpss server down, etc) are thrown as http
-	 *             errors.
+	 * @throws IOException in case of any IO error (cache full, etc). Normal
+	 *             Stager errors (Missing file, server down, etc) are sent
+	 *             as http errors to the user.
 	 */
-	File process(String hpssTarget, HttpServletRequest request,
+	File process(String fileTarget, HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 
 		boolean blocking = !isInteractiveClient(request);
@@ -120,7 +118,7 @@ public class StagerDispatcher {
 		java.io.File f = null;
 		try {
 			if (!dryrun)
-				f = cache.retrieveFile(hpssTarget, blocking);
+				f = cache.retrieveFile(fileTarget, blocking);
 
 			HttpSession s = request.getSession(true);
 
@@ -149,12 +147,12 @@ public class StagerDispatcher {
 		} catch (StagerException e) {
 			response.reset();
 			switch (e.getErrorCode()) {
-			case PERMANENT_FAIL:
+			case PERMANENT_FAILURE:
 				response.sendError(
 						HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e
 								.getLocalizedMessage());
 				break;
-			case TEMPORARY_FAIL:
+			case TEMPORARY_FAILURE:
 				response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
 						e.getMessage());
 				break;
@@ -178,34 +176,29 @@ public class StagerDispatcher {
 	}
 
 	/**
-	 * Retrieves a file from HPSS into the cache and returns. If the file is
+	 * Retrieves a file from the staged system into the cache and returns. If the file is
 	 * already cached the call will return immediately. The call can wait until
 	 * the file is in the cache (blocking) or still return immediately after
 	 * scheduling its retrieval.
 	 * 
-	 * @param hpssTarget
-	 *            target file to stage
-	 * @param blocking
-	 *            if this call will block until the file is available
+	 * @param fileTarget target file to stage
+	 * @param blocking if this call will block until the file is available
 	 * @return if the file is available (always true if called in blocking mode)
-	 * @throws StagerException
-	 *             if retrieval from hpss fails
-	 * @throws IOException
-	 *             in case of any other IO error (cache full, etc)
+	 * @throws StagerException if retrieval from stager fails
+	 * @throws IOException in case of any other IO error (cache full, etc)
 	 */
-	boolean retrieve(String hpssTarget, boolean blocking) throws StagerException,
+	boolean retrieve(String fileTarget, boolean blocking) throws StagerException,
 			IOException {
 		if (dryrun)
 			return false;
-		return cache.retrieveFile(hpssTarget, blocking) != null;
+		return cache.retrieveFile(fileTarget, blocking) != null;
 	}
 
 	/**
 	 * Tries to guess if the request was initiated from an interactive client
 	 * (browser) or not (wget, curl, etc)
 	 * 
-	 * @param request
-	 *            the HTTP request
+	 * @param request the HTTP request
 	 * @return if this request was initiated by an interactive client
 	 */
 	static boolean isInteractiveClient(HttpServletRequest request) {
@@ -217,10 +210,9 @@ public class StagerDispatcher {
 	}
 
 	/**
-	 * Signals that the hpss stager won't be required anymore.
+	 * Signals that the stager won't be required anymore.
 	 * 
-	 * @param force
-	 *            force the termination
+	 * @param force force the termination
 	 */
 	void terminate(boolean force) {
 		LOG.info("Destroying the Stager");

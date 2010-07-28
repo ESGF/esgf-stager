@@ -13,6 +13,11 @@ import javax.crypto.spec.DESKeySpec;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
+/**
+ * All help methods that don't fit anywhere else....
+ * 
+ * @author Estanislao Gonzalez
+ */
 public class Misc {
 	
 	
@@ -60,6 +65,9 @@ public class Misc {
 	}
 
 	/**
+	 * Encrypts a word if provided or ask the user to give one. No decription
+	 * here.
+	 * 
 	 * @param args words to encode (or nothing for interactive)
 	 * @throws IOException If cannot read from stdin
 	 */
