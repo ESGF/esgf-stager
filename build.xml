@@ -82,7 +82,9 @@ Builds the project via ant (obviously).
 	<property name="project_name" value="ESGF-Stager" />
 	<property name="author" value="Estanislao Gonzalez" />
 
-	<!--
+  <ivy:settings file="./ivysettings.xml" />
+
+  <!--
       ************************************************************
       Global Initialization and Preparation....
       ************************************************************
