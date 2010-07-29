@@ -1,9 +1,9 @@
 package esgf.node.stager.utils;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Properties;
 import java.util.Map.Entry;
 
@@ -33,22 +33,25 @@ public class ExtendedProperties extends Properties {
 
 	/**
 	 * Create an ExtendedProperties object from the given Properties one.
-	 * @param defaults
+	 * @param properties properties being copied
 	 */
-	public ExtendedProperties(Properties defaults) {
-		super(defaults);
+	public ExtendedProperties(Properties properties) {
+		super();
+		this.putAll(properties);
+		
 		if (LOG.isDebugEnabled()) dumpProps();
 	}
 	
 	/**
-	 * Create an ExtendedProperties object from the given Properties one,
-	 * but only importing properties which contain a definite prefix.
-	 * @param defaults
+	 * Create an ExtendedProperties object from the given Properties one, but
+	 * only importing properties which contain a definite prefix.
+	 * 
+	 * @param properties properties being copied
 	 * @param prefix String to which all imported properties will match.
 	 */
-	public ExtendedProperties(String prefix, Properties defaults) {
+	public ExtendedProperties(String prefix, Properties properties) {
 		super();
-		for (Entry<Object, Object> e : defaults.entrySet()) {
+		for (Entry<Object, Object> e : properties.entrySet()) {
 			
 			if (((String)e.getKey()).startsWith(prefix)) {
 				setProperty((String)e.getKey(), (String)e.getValue());
@@ -58,16 +61,16 @@ public class ExtendedProperties extends Properties {
 	}
 	
 	/**
-	 * Load properties from given file
+	 * Load properties from given file (only UTF-8 supported)
+	 * 
 	 * @param fileName file to load properties from
 	 * @throws IOException Cannot access file
 	 * @throws FileNotFoundException File not found
 	 */
 	public ExtendedProperties(String fileName) throws FileNotFoundException, IOException {
 		super();
-		
-		load(new FileInputStream(new File(fileName)));
-		if (LOG.isDebugEnabled()) dumpProps("File: " + fileName);
+		load( new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
+		if (LOG.isDebugEnabled()) dumpProps("Properties read from file: " + fileName + "\n");
 	}
 	
 	private void dumpProps(String... info) {
