@@ -5,9 +5,7 @@
 *                                                                          *
 ****************************************************************************
 *                                                                          *
-*   Copyright (c) 2009, Lawrence Livermore National Security, LLC.         *
-*   Produced at the Lawrence Livermore National Laboratory                 *
-*   LLNL-CODE-420962                                                       *
+*   Copyright (c) 2010, Max Planck Institute for Meteorology.              *
 *                                                                          *
 *   All rights reserved. This file is part of the:                         *
 *   Earth System Grid (ESG) Data Node Software Stack, Version 1.0          *
@@ -212,13 +210,14 @@ Builds the project via ant (obviously).
 
 	<target name="deps" depends="init-ivy" description="(Sets up library dependencies: Ivy)">
 		<mkdir dir="${lib_fetched_dir}" />
-		<ivy:retrieve sync="false" />
+		<ivy:retrieve sync="false" type="jar"/>
 		<path id="main_classpath">
 			<fileset dir="${lib_dir}">
 				<include name="**/*.jar" />
 				<exclude name="**/junit*.jar" />
 				<exclude name="**/*javadoc.jar" />
 				<exclude name="**/*sources.jar" />
+				<exclude name="${lib_fetched_dir}/source/*" />
 			</fileset>
 			<pathelement path="${build_dir}" />
 		</path>
@@ -232,7 +231,14 @@ Builds the project via ant (obviously).
 		<echo>${_cp}</echo>
 		<echo message="--------------------------------" />
 	</target>
-
+	
+	<target name="deps_sources" depends="init-ivy" description="(Sets up library dependencies: Ivy)">
+		<mkdir dir="${lib_fetched_dir}" />
+		<echo message="Retrieving sources:" />
+		<ivy:retrieve sync="false" type="source" pattern="${lib_fetched_dir}/[type]/[artifact]-[revision]-src.[ext]"/>
+		<echo message="--------------------------------" />
+	</target>
+	
 	<target name="dep_report" depends="deps" description="(Generates a report of library dependencies)">
 		<mkdir dir="${lib_deps_reports_dir}" />
 		<ivy:report todir="${lib_deps_reports_dir}"/>
@@ -296,7 +302,7 @@ Builds the project via ant (obviously).
 		</delete>
 		<mkdir dir="${dist_dir}" />
 		<jar destfile="${dist_dir}/${module}.${version_num}.jar">
-			<fileset dir="${build_dir}" includes="esgf/**,**/*.properties" excludes="**/test/**" />
+			<fileset dir="${build_dir}" includes="esgf/**,**/*.properties" excludes="**/test/**,**/*Test*,**/Internal*" />
 			<manifest>
 				<attribute name="Organization" value="${organization}" />
 				<attribute name="Author" value="${author}" />
@@ -334,77 +340,10 @@ Builds the project via ant (obviously).
 		</jar>
 	</target>
 
-	<target name="make_common_jar" depends="make" description="(Creates common jar file)">
-		<echo message="JAR -  ${test_build_dir} ->> ${dist_dir}/${module}-common.${version_num}.jar" />
-		<delete>
-			<fileset dir="." includes="${dist_dir}/${module}-common*.jar" />
-		</delete>
-		<mkdir dir="${dist_dir}" />
-		<jar destfile="${dist_dir}/${module}-common.${version_num}.jar">
-			<fileset dir="${build_dir}" includes="esgf/stager/common/**" />
-			<manifest>
-				<attribute name="Organization" value="${organization}" />
-				<attribute name="Author" value="${author}" />
-				<attribute name="Project" value="${project_name} ${module} common" />
-				<attribute name="Module" value="${module}" />
-				<attribute name="Version" value="${version_num}" />
-				<attribute name="Release-Name" value="${release_name}" />
-				<section name="esgf/stager/common/">
-					<attribute name="Sealed" value="false" />
-				</section>
-			</manifest>
-		</jar>
-	</target>
-
-	<target name="make_fe_jar" depends="make" description="(Creates the jar file distribution for client Front End GUI)">
-		<echo message="JAR -  ${build_dir} ->> ${dist_dir}/${module}-fe.${version_num}.jar" />
-		<delete>
-			<fileset dir="." includes="${dist_dir}/${module}-fe.${version_num}.jar" />
-		</delete>
-		<mkdir dir="${dist_dir}" />
-		<jar destfile="${dist_dir}/${module}-fe.${version_num}.jar">
-			<fileset dir="${build_dir}" includes="esgf/node/**,esgf/**/common/**,**/*.properties" excludes="**/test/**,**/node.properties/**" />
-			<manifest>
-				<attribute name="Organization" value="${organization}" />
-				<attribute name="Author" value="${author}" />
-				<attribute name="Project" value="${project_name}" />
-				<attribute name="Module" value="${module} fe" />
-				<attribute name="Version" value="${version_num}" />
-				<attribute name="Release-Name" value="${release_name}" />
-				<attribute name="Main-Class" value="${main_class}" />
-				<section name="esgf/node/stager/">
-					<attribute name="Sealed" value="false" />
-				</section>
-			</manifest>
-		</jar>
-	</target>
-
-	<target name="make_connector_jar" depends="make" description="(Creates the jar file distribution for node connector component to stager [non-java] component)">
-		<echo message="JAR -  ${build_dir} ->> ${dist_dir}/${module}-connector.${version_num}.jar" />
-		<delete>
-			<fileset dir="." includes="${dist_dir}/${module}-connector.${version_num}.jar" />
-		</delete>
-		<mkdir dir="${dist_dir}" />
-		<jar destfile="${dist_dir}/${module}-connector.${version_num}.jar">
-			<fileset dir="${build_dir}" includes="esgf/node/**/connector/**,esgf/**/common/**,**/*.properties" excludes="**/test/**,**/node.properties/**" />
-			<manifest>
-				<attribute name="Organization" value="${organization}" />
-				<attribute name="Author" value="${author}" />
-				<attribute name="Project" value="${project_name} ${module} connector" />
-				<attribute name="Module" value="${module}" />
-				<attribute name="Version" value="${version_num}" />
-				<attribute name="Release-Name" value="${release_name}" />
-				<section name="esgf/node/stager/connector/">
-					<attribute name="Sealed" value="false" />
-				</section>
-			</manifest>
-		</jar>
-	</target>
-
-	<target name="make_all_jars" depends="make_jar,make_test_jar,make_common_jar,make_fe_jar,make_connector_jar" />
+	<target name="make_all_jars" depends="make_jar,make_test_jar" />
 
 	<target name="make_dist" depends="make_all_jars" description="(Creates full software distribution)">
-		<delete file="${dist_dir}/${module}.${version_num}.tar.gz" />
+		<delete file="${dist_dir}/${module}.${version_num}-dependencies.tar.gz" />
 		<tar destfile="${dist_dir}/${module}.${version_num}.tar">
 			<tarfileset dir="${dist_dir}" includes="**/*.jar,**/*.war" prefix="${module}.${version_num}" />
 			<tarfileset dir="${basedir}" prefix="${module}.${version_num}">
@@ -412,6 +351,8 @@ Builds the project via ant (obviously).
 				<include name="INSTALL" />
 				<include name="README" />
 			</tarfileset>
+			<tarfileset dir="${lib_dir}" prefix="${module}.${version_num}/dep"  includes="*.jar,*.LICENSE" />
+			<tarfileset dir="${lib_fetched_dir}" prefix="${module}.${version_num}/dep"  includes="*.jar,*.LICENSE" excludes="**/sources/*"/>
 		</tar>
 		<gzip destfile="${dist_dir}/${module}.${version_num}.tar.gz" src="${dist_dir}/${module}.${version_num}.tar" />
 		<delete file="${dist_dir}/${module}.${version_num}.tar" />

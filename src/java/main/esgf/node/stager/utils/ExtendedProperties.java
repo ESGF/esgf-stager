@@ -67,10 +67,17 @@ public class ExtendedProperties extends Properties {
 	 * @throws IOException Cannot access file
 	 * @throws FileNotFoundException File not found
 	 */
-	public ExtendedProperties(String fileName) throws FileNotFoundException, IOException {
+	public ExtendedProperties(String fileName) throws FileNotFoundException,
+			IOException {
 		super();
-		load( new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
-		if (LOG.isDebugEnabled()) dumpProps("Properties read from file: " + fileName + "\n");
+
+		InputStreamReader reader = new InputStreamReader(new FileInputStream(
+				fileName), "UTF-8");
+		load(reader);
+		reader.close();
+
+		if (LOG.isDebugEnabled()) dumpProps("Properties read from file: "
+				+ fileName + "\n");
 	}
 	
 	private void dumpProps(String... info) {
@@ -122,6 +129,7 @@ public class ExtendedProperties extends Properties {
 		String tmp = getProperty(name);
 		if (tmp == null) {
 			if (defValue.length == 0) {
+				LOG.error("Missing config property " + name);
 				throw new StagerException("Missing config property " + name);
 			} else {
 				LOG.warn(name+ " missing, using default value: " + defValue[0]);

@@ -22,7 +22,7 @@ import esgf.node.stager.utils.ExtendedProperties;
  * @author Estanislao Gonzalez
  */
 public class StagerDispatcher {
-
+	public static final String PROP_DRYRUM = "dryrun";
 	/**
 	 * This data will be added to the session to keep track while waiting for
 	 * a file to arrive.
@@ -85,7 +85,7 @@ public class StagerDispatcher {
 			LOG.debug("While wait redirecting to:" + redirectPage);
 
 		// if set no file will be retrieved (used for testing!)
-		dryrun = props.getCheckedProperty("dryrun", Boolean.FALSE);
+		dryrun = props.getCheckedProperty(PROP_DRYRUM, Boolean.FALSE);
 		if (dryrun) LOG.warn("Stager started in Dry-Run Mode");
 
 		LOG.info("Stager is up and running.");
