@@ -22,7 +22,7 @@ generated/
 /lib/fetched
 /.classpath
 /.project
-
+/cobertura.ser
 /docs-generated
 /dist
 /build

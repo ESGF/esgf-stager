@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import esgf.node.stager.io.StagerException;
 import esgf.node.stager.utils.ExtendedProperties;
 
 /**
@@ -29,6 +30,12 @@ import esgf.node.stager.utils.ExtendedProperties;
 public class StagerFilter implements Filter {
 	private static final Logger LOG = Logger.getLogger(StagerFilter.class);
 	private static final boolean DEBUG = LOG.isDebugEnabled();
+	/**
+	 * Filter init parameter pointing to the relative path (from this
+	 * application) of the configuration file.
+	 */
+	public static final String PARAM_CONFIG_FILE = "configurationFile";
+	
 	public static final String PROP_PRE = "filter.";
 	public static final String PROP_SERV = "service";
 	public static final String PROP_SERV_PATTERN = ".pattern";
@@ -78,7 +85,7 @@ public class StagerFilter implements Filter {
 						stager.process(fileName, request, response);
 					} else {
 						if (DEBUG)
-							LOG.debug("File not in HPSS: " + fileName);
+							LOG.debug("File not in Staged system: " + fileName);
 					}
 
 				} else {
@@ -124,13 +131,22 @@ public class StagerFilter implements Filter {
 
 		// load properties
 		String propPath = config.getServletContext().getRealPath(
-				config.getInitParameter("HPSSFilterConfigLocation"));
-		if (propPath == null)
+				config.getInitParameter(PARAM_CONFIG_FILE));
+		if (propPath == null) 
 			throw new ServletException(
-					"Missing configuration file (set in HPSSFilterConfigLocation init param)");
-
+					"Missing configuration file parameter (set in '"
+							+ PARAM_CONFIG_FILE + "' init param)");
+		
+		ExtendedProperties props;
 		try {
-			ExtendedProperties props = new ExtendedProperties(propPath);
+			try {
+				props = new ExtendedProperties(propPath);
+			} catch (FileNotFoundException e1) {
+				throw new ServletException(
+						"Missing configuration file (set in '"
+								+ PARAM_CONFIG_FILE + "' init param)");
+			}
+			
 			String[] services = ((String) props.getCheckedProperty(PROP_PRE
 					+ PROP_SERV)).split(",");
 			for (int i = 0; i < services.length; i++) {
@@ -151,11 +167,15 @@ public class StagerFilter implements Filter {
 		} catch (FileNotFoundException e) {
 			LOG.error("Filter properties not found (" + propPath + ")");
 			throw new ServletException("Filter properties not found ("
-					+ propPath + ")");
+					+ propPath + ")", e);
+		} catch (StagerException e) {
+			LOG.error("Error while creating the stager", e);
+			throw new ServletException("Error while creating the stager"
+					, e);
 		} catch (IOException e) {
 			LOG.error("Error accesing Filter properties (" + propPath + ")");
 			throw new ServletException("Error accesing Filter properties ("
-					+ propPath + ")");
+					+ propPath + ")", e);
 		}
 
 	}

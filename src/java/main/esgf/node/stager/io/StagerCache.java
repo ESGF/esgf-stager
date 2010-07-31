@@ -202,7 +202,7 @@ public class StagerCache {
 	 */
 	public StagerCache(ExtendedProperties props) throws StagerException {
 		// parse own properties and pass the rest to FileGrabber
-		localDirectory = new File(props.getProperty(PROP_LOCAL_DIR));
+		localDirectory = new File((String)props.getCheckedProperty(PROP_LOCAL_DIR));
 
 		// perform checks
 		if (localDirectory == null || !localDirectory.isDirectory()) { throw new IllegalArgumentException(

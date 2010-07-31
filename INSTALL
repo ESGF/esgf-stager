@@ -7,3 +7,23 @@
 #*****************************************************************
 
 INSTALL:
+
+Install as a tomcat Filter in the application web.xml  and provide the 
+"configurationFile" pointing to the configuration file (the path is relative 
+to the installed directory). 
+
+For example:
+
+    	<!-- HPSS Filter -->
+	<filter>
+		<filter-name>StagerFilter</filter-name>
+		<filter-class>esgf.node.stager.web.StagerFilter</filter-class>
+		<init-param>		
+			<param-name>configurationFile</param-name>
+			<param-value>/WEB-INF/stager.properties</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>StagerFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
