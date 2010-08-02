@@ -18,7 +18,6 @@ public class MockFilterConfig implements FilterConfig {
 		context.setInit(props);
 	}
 	
-	@Override
 	public String getFilterName() {
 		return filterName;
 	}
