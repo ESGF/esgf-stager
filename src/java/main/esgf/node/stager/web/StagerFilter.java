@@ -128,23 +128,23 @@ public class StagerFilter implements Filter {
 	 */
 	@Override
 	public void init(FilterConfig config) throws ServletException {
-
-		// load properties
-		String propPath = config.getServletContext().getRealPath(
-				config.getInitParameter(PARAM_CONFIG_FILE));
-		if (propPath == null) 
+		String propFilePath = config.getInitParameter(PARAM_CONFIG_FILE);
+		if (propFilePath == null) 
 			throw new ServletException(
 					"Missing configuration file parameter (set in '"
 							+ PARAM_CONFIG_FILE + "' init param)");
+		// load properties
+		String propPath = config.getServletContext().getRealPath(
+				propFilePath);
+
 		
 		ExtendedProperties props;
 		try {
 			try {
 				props = new ExtendedProperties(propPath);
 			} catch (FileNotFoundException e1) {
-				throw new ServletException(
-						"Missing configuration file (set in '"
-								+ PARAM_CONFIG_FILE + "' init param)");
+				throw new ServletException("Missing configuration file: "
+						+ propFilePath);
 			}
 			
 			String[] services = ((String) props.getCheckedProperty(PROP_PRE

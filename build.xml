@@ -528,39 +528,9 @@ Builds the project via ant (obviously).
 	<!-- - - - - - - - - - - - - - - - - - 
           target: coverage_report                      
          - - - - - - - - - - - - - - - - - -->
-	<target name="coverage_report" depends="init,make">
-		<delete dir="${test_results_dir}" />
-		<mkdir dir="${test_results_dir}" />
-		<mkdir dir="${test_build_dir}" />
-		<depend srcdir="${test_src_dir}" destdir="${test_build_dir}" cache="${depcache_dir}" closure="yes" />
-		<javac srcdir="${test_src_dir}" destdir="${test_build_dir}" excludes="**/no_comp/**,**/ignore/**,**/*_,**/*_*/**" classpathref="test_classpath" deprecation="true" failonerror="true" target="1.5" debug="on" verbose="off" nowarn="on" />
-
-		<!-- instrument test classes -->
-		<cobertura-instrument todir="${test_build_dir_inst}">
-			<fileset dir="${build_dir}/esgf">
-				<include name="**/*.class" />
-			</fileset>
-		</cobertura-instrument>
-
-		<path id="test_classpath">
-			<pathelement location="${test_build_dir_inst}" />
-			<fileset dir="${lib_dir}" includes="**/junit*.jar" />
-			<path refid="main_classpath" />
-			<pathelement location="${test_build_dir}" />
-		</path>
-
-		<junit errorproperty="failed" failureproperty="failed" printsummary="on" fork="yes" maxmemory="1024M">
-			<classpath refid="test_classpath" />
-			<formatter type="plain" usefile="false" />
-			<formatter type="xml" />
-			<test name="${testcase}" todir="${test_results_dir}" if="testcase" />
-			<batchtest todir="${test_results_dir}" unless="testcase">
-				<fileset dir="${test_build_dir}" includes="**/*Test*.class" />
-			</batchtest>
-			<assertions enableSystemAssertions="true">
-				<enable />
-			</assertions>
-		</junit>
+	<target name="coverage_report" depends="test">
+		<delete dir="${test_coverage_dir}" />
+		<mkdir dir="${test_coverage_dir}" />
 
 		<cobertura-report srcdir="${src_dir}" destdir="${test_coverage_dir}" />
 	</target>
@@ -673,21 +643,6 @@ Builds the project via ant (obviously).
 		</scp>
 	</target>
 
-	<!-- - - - - - - - - - - - - - - - - - 
-          target: local_tests                      
-         - - - - - - - - - - - - - - - - - -->
-	<target name="local_tests" depends="init">
-		<!--
-		<echo-file-html targetfile="${test_results_dir}/index.html" dir="${test_results_dir}" />
-		-->
-		<fileset dir="${test_build_dir}" includes="**/*Test*.class" id="xx">
-			<exclude name="**/Internal*.class"/>
-			<exclude name="**/*$$*.class"/>
-		</fileset>
-		<property name="t" refid="xx"/>
-
-		<echo>${t}</echo>
-	</target>
 	<!-- = = = = = = = = = = = = = = = = =
           macrodef: echo-file-html          
          = = = = = = = = = = = = = = = = = -->

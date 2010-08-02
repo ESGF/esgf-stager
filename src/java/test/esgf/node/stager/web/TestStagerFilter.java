@@ -4,11 +4,15 @@ package esgf.node.stager.web;
 import static esgf.node.stager.web.StagerFilter.PROP_PRE;
 import static esgf.node.stager.web.StagerFilter.PROP_SERV;
 import static esgf.node.stager.web.StagerFilter.PROP_SERV_PATTERN;
+import static org.junit.Assert.*;
 
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletException;
+
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,7 +21,8 @@ import esgf.node.stager.utils.ExtendedProperties;
 
 
 public class TestStagerFilter {
-
+	private static final Logger LOG = Logger.getLogger(TestStagerFilter.class);
+	private static final boolean DEBUG = LOG.isDebugEnabled();
 	private static Properties prop;
 	
 	@BeforeClass
@@ -47,14 +52,44 @@ public class TestStagerFilter {
 		for (int i = 0; i < services.length; i++) {
 			String pat = ((String)eprop.getCheckedProperty(PROP_PRE + services[i] + PROP_SERV_PATTERN));
 			Pattern p = Pattern.compile(pat);
-			System.out.print(test[i] + " : ");
+			if (DEBUG) LOG.debug(test[i] + " : ");
+			
 			Matcher m = p.matcher(test[i]);
 			if (m.find()) {
-				System.out.println(m.group(1));
+				LOG.info(m.group(1));
 			} else {
-				System.out.println("Not found");
+				LOG.info("Not found");
 			}
 		}
+	}
+	
+	@Test
+	public void testCreation() throws Exception {
+		MockFilterConfig config = new MockFilterConfig();
+		StagerFilter sf = new StagerFilter();
+		
+		try {
+			sf.init(config);
+			fail("Should have failed because of empty properties");			
+		} catch (ServletException e) {
+			//ok
+			LOG.info("Expected exception: " + e.getMessage());
+			assertTrue(e.getMessage().matches("[Mm]issing.*configurationFile.*"));
+		}
+		
+		Properties props = config.getProps();
+		props.put("configurationFile", "nonExisting");
+		
+		try {
+			sf.init(config);
+			fail("Should have failed because of missing properties file");			
+		} catch (ServletException e) {
+			//ok
+			LOG.info("Expected exception: " + e.getMessage());
+			assertTrue(e.getMessage().matches("[Mm]issing.*nonExisting.*"));
+		}
+		
+		
 	}
 
 }

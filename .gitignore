@@ -27,3 +27,5 @@ generated/
 /dist
 /build
 /logs
+/eclipse-build
+/local_build.xml
