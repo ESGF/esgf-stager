@@ -43,7 +43,6 @@ public class StagerFilter implements Filter {
 	private final Map<String, Pattern> services = new HashMap<String, Pattern>();
 	private StagerDispatcher stager;
 
-	@Override
 	public void destroy() {
 		stager.terminate(false);
 		LOG.info("Filter destroyed");
@@ -52,7 +51,6 @@ public class StagerFilter implements Filter {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void doFilter(ServletRequest req, ServletResponse res,
 			FilterChain chain) throws IOException, ServletException {
 
@@ -126,7 +124,6 @@ public class StagerFilter implements Filter {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void init(FilterConfig config) throws ServletException {
 		String propFilePath = config.getInitParameter(PARAM_CONFIG_FILE);
 		if (propFilePath == null) 
@@ -144,7 +141,7 @@ public class StagerFilter implements Filter {
 				props = new ExtendedProperties(propPath);
 			} catch (FileNotFoundException e1) {
 				throw new ServletException("Missing configuration file: "
-						+ propFilePath);
+						+ propPath);
 			}
 			
 			String[] services = ((String) props.getCheckedProperty(PROP_PRE

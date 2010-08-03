@@ -6,6 +6,7 @@ import static esgf.node.stager.web.StagerFilter.PROP_SERV;
 import static esgf.node.stager.web.StagerFilter.PROP_SERV_PATTERN;
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,17 +14,23 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import esgf.node.stager.io.StagerCache;
 import esgf.node.stager.utils.ExtendedProperties;
+import esgf.node.stager.utils.MiscUtils;
+import esgf.node.stager.utils.PrivilegedAccessor;
 
 
 public class TestStagerFilter {
 	private static final Logger LOG = Logger.getLogger(TestStagerFilter.class);
 	private static final boolean DEBUG = LOG.isDebugEnabled();
+	private ExtendedProperties eprop;
 	private static Properties prop;
+	private static File tmpDir;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -32,12 +39,26 @@ public class TestStagerFilter {
 		prop.setProperty("filter.dodS.pattern", "(.*).html");
 		prop.setProperty("filter.fileServer.pattern", "(.*)");
 		
+		try {
+			//create a tmp dir
+			tmpDir = File.createTempFile("test_cache", "");
+			assertTrue("Could not delete temp file", tmpDir.delete());
+			tmpDir.mkdir();
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Could not setup environment for test: " + e.getMessage());
+		}
+	}
+	
+	@AfterClass
+	public static void cleanup() {
+		MiscUtils.deleteAll(tmpDir, LOG);
 	}
 
-	private ExtendedProperties eprop;
 
 	@Before
 	public void setUp() throws Exception {
+		MiscUtils.emptyDir(tmpDir, LOG);
 		eprop = new ExtendedProperties(prop);
 	}
 	
@@ -90,6 +111,25 @@ public class TestStagerFilter {
 		}
 		
 		
+		//read basic properties
+		ExtendedProperties ep = new ExtendedProperties("resources/test/stager.properties");
+		
+		//create tmp dir for cache
+		File cacheDir = File.createTempFile("cache", "", tmpDir);
+		cacheDir.delete();
+		cacheDir.mkdir();
+		ep.put(PrivilegedAccessor.getField(StagerCache.class, "PROP_LOCAL_DIR"),
+				cacheDir.getAbsolutePath());
+		
+		//write properties in tmp file
+		File tmpPropFile = File.createTempFile("stager.test", "properties", tmpDir); 
+		ep.write(tmpPropFile.getAbsolutePath());
+		
+		props.put("configurationFile", tmpPropFile.getAbsolutePath());
+		config.getServletContext().setContextPath("");
+		sf.init(config);
+		
+
 	}
 
 }

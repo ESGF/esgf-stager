@@ -91,7 +91,6 @@ public class StagerCache {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public int compareTo(CacheEntry other) {
 			// simple logic - lastAccess (LIFO)
 			// this could be as complex as required, should be "preferable" fast

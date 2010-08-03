@@ -481,6 +481,7 @@ Builds the project via ant (obviously).
 		<cobertura-instrument todir="${test_build_dir_inst}">
 			<fileset dir="${build_dir}/esgf">
 				<include name="**/*.class" />
+				<exclude name="**/Test*,**/Mock*,**/Internal*" />
 			</fileset>
 		</cobertura-instrument>
 		

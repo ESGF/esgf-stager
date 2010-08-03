@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import esgf.node.stager.utils.ExtendedProperties;
 import esgf.node.stager.utils.Misc;
+import esgf.node.stager.utils.MiscUtils;
 import esgf.node.stager.utils.PrivilegedAccessor;
 
 /**
@@ -61,31 +62,9 @@ public class TestStagerCache {
 	
 	@After
 	public void cleanUp() {
-		cleanDir(tmpDir);			//delete everything
-		assertTrue(tmpDir.mkdir());	//recreate the basic structure
+		MiscUtils.emptyDir(tmpDir, LOG);			//empty the tmp directory
 	}
-	
-	/**
-	 * Used for recursive deletion of a directory structure.
-	 * @param file directory/file being currently handled
-	 */
-	private static void cleanDir(File file) {
-		if (!file.isDirectory()) {
-			boolean result = file.delete();
-			if (DEBUG)
-				LOG.debug("Deleting file: " + file.getAbsolutePath() + " result: "
-					+ result);
-		} else {
-			File[] content = file.listFiles();
-			for (int i = 0; i < content.length; i++) {
-				cleanDir(content[i]);
-			}
-			if (!file.delete()) {
-				LOG.warn("Could not delete directory: "
-						+ file.getAbsolutePath());
-			}
-		}
-	}
+
 	
 	/**
 	 * Test that the configuration parameters are properly set and read.

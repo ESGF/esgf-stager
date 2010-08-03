@@ -2,8 +2,11 @@ package esgf.node.stager.utils;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.Calendar;
 import java.util.Properties;
 import java.util.Map.Entry;
 
@@ -15,9 +18,21 @@ import esgf.node.stager.io.StagerException;
  * Extends the normal property class to allow:
  * <ul>
  * <li>retrieve checked property (throws exception if not checked)</li>
+ * <li>retrieve property casting it to the type of the passed default value if
+ * any. (Only for Integer, Long, Double, Float and Boolean)</br> For example:
+ * 
+ * <pre>
+ * int port = eProperties.getCheckedProperty(&quot;port&quot;, 22);
+ * </pre>
+ * 
+ * (the int Integer conversion works because of unboxing, the method returns an
+ * object.</li>
+ * <li>retrieve property or default value if property not found</li>
+ * <li>Read properties at filename (utf-8 only)</li>
+ * <li>Write properties at filename (utf-8)</li>
  * </ul>
+ * 
  * @author Estanislao Gonzalez
- *
  */
 public class ExtendedProperties extends Properties {
 	private static final long serialVersionUID = 6780295775257064354L;
@@ -71,17 +86,33 @@ public class ExtendedProperties extends Properties {
 			IOException {
 		super();
 
-		InputStreamReader reader = new InputStreamReader(new FileInputStream(
-				fileName), "UTF-8");
-		load(reader);
-		reader.close();
+		readFromFile(fileName);
 
 		if (LOG.isDebugEnabled()) dumpProps("Properties read from file: "
 				+ fileName + "\n");
 	}
 	
+	private void readFromFile(String fileName) throws IOException {
+		InputStreamReader reader = new InputStreamReader(new FileInputStream(
+				fileName), "UTF-8");
+		load(reader);
+		reader.close();
+	}
+	
+	private void writeToFile(String fileName) throws IOException {
+		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(
+				fileName), "UTF-8");
+		store(out, "Created by " + this.getClass().getCanonicalName() + " @ "
+				+ String.format("%tF%n", Calendar.getInstance()));
+		InputStreamReader reader = new InputStreamReader(new FileInputStream(
+				fileName), "UTF-8");
+		load(reader);
+		reader.close();
+	}
+	
 	private void dumpProps(String... info) {
 		StringBuilder sb = new StringBuilder();
+		
 		sb.append("Dumping properties\n");
 		for (int i = 0; i < info.length; i++) {
 			sb.append(info[i]);
@@ -91,6 +122,27 @@ public class ExtendedProperties extends Properties {
 			sb.append(e.getKey()).append('=').append(e.getValue()).append('\n');
 		}
 		LOG.debug(sb.toString());
+	}
+	
+	/**
+	 * Write current properties to a file.
+	 * 
+	 * <pre>
+	 * read(file1);
+	 * write(file2);
+	 * </pre>
+	 * 
+	 * does not imply file1 == file2 because the order is arbitrary and no
+	 * comments from file1 were read.
+	 * 
+	 * @param fileName file to write properties to
+	 * @throws IOException Cannot access file
+	 */
+	public void write(String fileName) throws IOException {
+		writeToFile(fileName);
+
+		if (LOG.isDebugEnabled()) LOG.debug("Properties saved to file:"
+				+ fileName);
 	}
 	
 	/**

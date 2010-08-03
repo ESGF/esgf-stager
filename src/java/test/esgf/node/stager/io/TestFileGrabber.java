@@ -5,18 +5,18 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import esgf.node.stager.io.FileGrabber.Callback;
 import esgf.node.stager.utils.ExtendedProperties;
 import esgf.node.stager.utils.Misc;
+import esgf.node.stager.utils.MiscUtils;
 import esgf.node.stager.utils.PrivilegedAccessor;
 
 
@@ -58,10 +58,13 @@ public class TestFileGrabber {
 		testProps.put("ftp.serverRootDirectory", "pub/");
 		testProps.put("ftp.userName", Misc.transform(false, "Anonymous"));
 		testProps.put("ftp.userPassword", Misc.transform(false, "none"));
-		
-
 	}
 
+	@After
+	public void cleanAfterEachTest() {
+		MiscUtils.emptyDir(tmpDir, LOG);
+	}
+	
 	/**
 	 * Checks the properties are properly read and an exception is thrown if not
 	 * properly set.
@@ -144,12 +147,12 @@ public class TestFileGrabber {
 			FileGrabber g = new FileGrabber(testProps);
 			RemoteFile hf = g.getFileInfo(files[i]);
 			File f = new File(tmpDir, hf.getFilename());
+			assertTrue(f.createNewFile());
 			f.deleteOnExit();
 
 			LOG.info("Tmp file created: " + f.getAbsolutePath());
 			
 			g.grabLater(hf, f, new Callback(){
-				@Override
 				public void done(File localFile) {
 					LOG.info("Done with: " + localFile.getAbsolutePath());
 					synchronized (TestFileGrabber.this) {
@@ -175,7 +178,7 @@ public class TestFileGrabber {
 			assertEquals(hf.getLastMod(), new Date(f.lastModified()));
 			
 			
-			showFile(f);
+			MiscUtils.showFile(f, LOG);
 		}
 		
 	}
@@ -218,20 +221,10 @@ public class TestFileGrabber {
 		g.grabAndWait(g.getFileInfo(target1), f);
 		assertTrue(f.length() > 0);
 		
-		showFile(f);
+		MiscUtils.showFile(f, LOG);
 	}
 	
 		
-	private void showFile(File f) throws IOException {
-		FileInputStream in = new FileInputStream(f);
-		
-		byte[] buff = new byte[1024];
-		int read = 0;
-		while ((read = in.read(buff)) > 0) {
-			LOG.info(new String(buff, 0, read));
-		}
-		
-		in.close();
-	}
+
 
 }

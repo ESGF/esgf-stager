@@ -4,7 +4,6 @@ import java.util.Enumeration;
 import java.util.Properties;
 
 import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
 
 public class MockFilterConfig implements FilterConfig {
 	private Properties props;
@@ -22,18 +21,17 @@ public class MockFilterConfig implements FilterConfig {
 		return filterName;
 	}
 
-	@Override
+	
 	public String getInitParameter(String arg0) {
 		return (String)props.get(arg0);
 	}
 
-	@Override
+	
 	public Enumeration<?> getInitParameterNames() {
 		return props.propertyNames();
 	}
 
-	@Override
-	public ServletContext getServletContext() {
+	public MockServletContext getServletContext() {
 		return context;
 	}
 

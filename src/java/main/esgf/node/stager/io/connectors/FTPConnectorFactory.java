@@ -15,7 +15,6 @@ public class FTPConnectorFactory implements RemoteConnectorFactory {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public RemoteConnector getInstance()
 			throws StagerException {
 		return new FTPConnector(config);
@@ -24,7 +23,6 @@ public class FTPConnectorFactory implements RemoteConnectorFactory {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void setup(ExtendedProperties props) {
 		config = props;
 	}

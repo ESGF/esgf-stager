@@ -190,7 +190,6 @@ public class FileGrabber {
 	 */
 	private Runnable makeTask(final Job j) {
 		return new Runnable() {
-			@Override
 			public void run() {
 				try {
 					RemoteConnector rc = remoteConnectorFactory.getInstance();

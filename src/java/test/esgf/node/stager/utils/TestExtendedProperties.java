@@ -1,6 +1,8 @@
 package esgf.node.stager.utils;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,8 +40,7 @@ public class TestExtendedProperties {
 			propString.append(propKeys[i]).append('=');
 			propString.append(propVals[i]).append('\n');
 		}
-		LOG.debug("Property file with content:\n"
-				+ propString.toString());
+		LOG.debug("Property file with content:\n" + propString.toString());
 
 		propFile = File.createTempFile("test", "properties");
 		Writer out = new OutputStreamWriter(new FileOutputStream(propFile),
@@ -50,7 +51,7 @@ public class TestExtendedProperties {
 
 	@AfterClass
 	public static void teardown() {
-		propFile.deleteOnExit();
+		if (!propFile.delete()) LOG.warn("can't delete property file.");
 	}
 
 	@Test
@@ -66,7 +67,7 @@ public class TestExtendedProperties {
 		ExtendedProperties ep2 = new ExtendedProperties(props);
 		assertEquals(props.size(), ep2.size());
 		assertEquals(props.entrySet(), ep2.entrySet());
-		
+
 		// form properties but filter by prefix
 		ExtendedProperties ep4 = new ExtendedProperties("test1", props);
 		assertEquals(2, ep4.size());
@@ -78,23 +79,53 @@ public class TestExtendedProperties {
 		assertEquals(props.size(), ep3.size());
 		assertEquals(props.entrySet(), ep3.entrySet());
 	}
-	
+
 	@Test
 	public void testRetrieval() throws Exception {
 		// turn off debugging
 		Logger.getLogger(ExtendedProperties.class).setLevel(Level.INFO);
 
 		ExtendedProperties ep = new ExtendedProperties(props);
-		
+
 		String val = "Yikes";
-		assertEquals(val, ep.getCheckedProperty("non-existent", val));
 		assertEquals(propVals[0], ep.getCheckedProperty(propKeys[0], val));
-		
+
 		try {
 			ep.getCheckedProperty("non-existent");
 			fail("Should have thrown an exception.");
 		} catch (StagerException e) {
-			//ok
+			// ok
 		}
+		
+		//test different types
+		assertEquals(val, ep.getCheckedProperty("non-existent", val));
+		assertEquals(new Integer(1), ep.getCheckedProperty("non-existent", 1));
+		assertEquals(new Long(1), ep.getCheckedProperty("non-existent", 1L));
+		assertEquals(new Float(1.0f), ep.getCheckedProperty("non-existent", 1.0f));
+		assertEquals(new Double(1.0), ep.getCheckedProperty("non-existent", 1.0));
+		assertEquals(Boolean.TRUE, ep.getCheckedProperty("non-existent", true));
+
+	}
+
+	@Test
+	public void testWriteToFile() throws Exception {
+		//put some properties
+		ExtendedProperties ep = new ExtendedProperties();
+		ep.put("key1", "value1");
+		ep.put("key2", "value2");
+
+		//create temporary file
+		File f = File.createTempFile("testWriteToFile", "properties");
+		
+		//write props down
+		ep.write(f.getAbsolutePath());
+		MiscUtils.showFile(f, LOG);
+
+		//retrieve them again and check the are the same we put
+		ExtendedProperties ep2 = new ExtendedProperties(f.getAbsolutePath());
+		assertEquals(ep, ep2);
+		
+		//clean up
+		f.delete();
 	}
 }
