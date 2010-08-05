@@ -56,4 +56,9 @@
 #*
 #***************************************************************************
 
+project_name=ESGF Stager
+author=Estanislao Gonzalez
 
+version_num=1.0.0.1
+release_name=Flatbush
+main_class=none
