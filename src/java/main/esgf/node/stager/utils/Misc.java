@@ -10,8 +10,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * All help methods that don't fit anywhere else....
@@ -48,14 +47,12 @@ public class Misc {
 				}
 				
 				c.init(Cipher.DECRYPT_MODE, k);				
-				BASE64Decoder dec = new BASE64Decoder();
-				byte[] result = c.doFinal(dec.decodeBuffer(str));
+				byte[] result = c.doFinal(Base64.decodeBase64(str));
 				return new String(result);
 			} else {
 				c.init(Cipher.ENCRYPT_MODE, k);
 				byte[] result = c.doFinal(str.getBytes());
-				BASE64Encoder enc = new BASE64Encoder();
-				return "des:" + enc.encode(result);
+				return "des:" + new String(Base64.encodeBase64(result));
 			}
 			
 		} catch (Exception e) {
