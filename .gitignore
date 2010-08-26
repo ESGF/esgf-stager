@@ -29,3 +29,4 @@ generated/
 /logs
 /eclipse-build
 /local_build.xml
+/eclipse-bin

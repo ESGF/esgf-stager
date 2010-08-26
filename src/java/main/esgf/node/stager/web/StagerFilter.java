@@ -24,157 +24,157 @@ import esgf.node.stager.utils.ExtendedProperties;
 
 /**
  * Stage files from the remote system while being accessed.
- * 
+ *
  * @author Estanislao Gonzalez
  */
 public class StagerFilter implements Filter {
-	private static final Logger LOG = Logger.getLogger(StagerFilter.class);
-	private static final boolean DEBUG = LOG.isDebugEnabled();
-	/**
-	 * Filter init parameter pointing to the relative path (from this
-	 * application) of the configuration file.
-	 */
-	public static final String PARAM_CONFIG_FILE = "configurationFile";
-	
-	public static final String PROP_PRE = "filter.";
-	public static final String PROP_SERV = "service";
-	public static final String PROP_SERV_PATTERN = ".pattern";
+    private static final Logger LOG = Logger.getLogger(StagerFilter.class);
+    private static final boolean DEBUG = LOG.isDebugEnabled();
+    /**
+     * Filter init parameter pointing to the relative path (from this
+     * application) of the configuration file.
+     */
+    public static final String PARAM_CONFIG_FILE = "configurationFile";
 
-	private final Map<String, Pattern> services = new HashMap<String, Pattern>();
-	private StagerDispatcher stager;
+    public static final String PROP_PRE = "filter.";
+    public static final String PROP_SERV = "service";
+    public static final String PROP_SERV_PATTERN = ".pattern";
 
-	public void destroy() {
-		stager.terminate(false);
-		LOG.info("Filter destroyed");
-	}
+    private final Map<String, Pattern> services = new HashMap<String, Pattern>();
+    private StagerDispatcher stager;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void doFilter(ServletRequest req, ServletResponse res,
-			FilterChain chain) throws IOException, ServletException {
+    public void destroy() {
+        stager.terminate(false);
+        LOG.info("Filter destroyed");
+    }
 
-		if (req instanceof HttpServletRequest
-				&& res instanceof HttpServletResponse) {
+    /**
+     * {@inheritDoc}
+     */
+    public void doFilter(ServletRequest req, ServletResponse res,
+            FilterChain chain) throws IOException, ServletException {
 
-			HttpServletRequest request = (HttpServletRequest) req;
-			HttpServletResponse response = (HttpServletResponse) res;
+        if (req instanceof HttpServletRequest
+                && res instanceof HttpServletResponse) {
 
-			if (DEBUG)
-				LOG.debug("Filtering: " + request.getServletPath().substring(1)
-						+ ":" + request.getPathInfo());
+            HttpServletRequest request = (HttpServletRequest) req;
+            HttpServletResponse response = (HttpServletResponse) res;
 
-			// we have a servlet
-			String servlet = request.getServletPath().substring(1);
-			String path = request.getPathInfo();
+            if (DEBUG)
+                LOG.debug("Filtering: " + request.getServletPath().substring(1)
+                        + ":" + request.getPathInfo());
 
-			Pattern p = services.get(servlet);
-			if (p != null) {
-				// proceed to extract the filename
-				Matcher m = p.matcher(path);
-				if (m.find()) {
-					String fileName = m.group(1);
+            // we have a servlet
+            String servlet = request.getServletPath().substring(1);
+            String path = request.getPathInfo();
 
-					if (isStaged(fileName)) {
-						if (LOG.isDebugEnabled())
-							LOG.debug("Filter match: " + fileName);
+            Pattern p = services.get(servlet);
+            if (p != null) {
+                // proceed to extract the filename
+                Matcher m = p.matcher(path);
+                if (m.find()) {
+                    String fileName = m.group(1);
 
-						// stage file
-						stager.process(fileName, request, response);
-					} else {
-						if (DEBUG)
-							LOG.debug("File not in Staged system: " + fileName);
-					}
+                    if (isStaged(fileName)) {
+                        if (LOG.isDebugEnabled())
+                            LOG.debug("Filter match: " + fileName);
 
-				} else {
-					if (DEBUG)
-						LOG.debug("No filter match(" + p.pattern()
-								+ ") for path: " + path);
+                        // stage file
+                        stager.process(fileName, request, response);
+                    } else {
+                        if (DEBUG)
+                            LOG.debug("File not in Staged system: " + fileName);
+                    }
 
-				}
-			} else {
-				if (DEBUG)
-					LOG.debug("No patern for servlet: " + servlet);
+                } else {
+                    if (DEBUG)
+                        LOG.debug("No filter match(" + p.pattern()
+                                + ") for path: " + path);
 
-			}
+                }
+            } else {
+                if (DEBUG)
+                    LOG.debug("No patern for servlet: " + servlet);
 
-		}
+            }
 
-		chain.doFilter(req, res);
+        }
 
-		// the resulting page is in res
-		// we might inject code...
-	}
+        chain.doFilter(req, res);
 
-	/**
-	 * Checks if the current file is being held at the remote system.
-	 * 
-	 * @param fileName the filename to check (DRS structure in case of CMIP5,
-	 *            i.e. path and filename)
-	 * @return if this file is being staged
-	 */
-	private boolean isStaged(String fileName) {
-		// TODO this will probably connect to a DB to check if this is the case
-		// we could implement a regexp if we get a proper algorithm to
-		// differentiate the files. For the time being every hit to this filter
-		// implies the file is staged.
-		return true;
-	}
+        // the resulting page is in res
+        // we might inject code...
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void init(FilterConfig config) throws ServletException {
-		String propFilePath = config.getInitParameter(PARAM_CONFIG_FILE);
-		if (propFilePath == null) 
-			throw new ServletException(
-					"Missing configuration file parameter (set in '"
-							+ PARAM_CONFIG_FILE + "' init param)");
-		// load properties
-		String propPath = config.getServletContext().getRealPath(
-				propFilePath);
+    /**
+     * Checks if the current file is being held at the remote system.
+     *
+     * @param fileName the filename to check (DRS structure in case of CMIP5,
+     *            i.e. path and filename)
+     * @return if this file is being staged
+     */
+    private boolean isStaged(String fileName) {
+        // TODO this will probably connect to a DB to check if this is the case
+        // we could implement a regexp if we get a proper algorithm to
+        // differentiate the files. For the time being every hit to this filter
+        // implies the file is staged.
+        return true;
+    }
 
-		
-		ExtendedProperties props;
-		try {
-			try {
-				props = new ExtendedProperties(propPath);
-			} catch (FileNotFoundException e1) {
-				throw new ServletException("Missing configuration file: "
-						+ propPath);
-			}
-			
-			String[] services = ((String) props.getCheckedProperty(PROP_PRE
-					+ PROP_SERV)).split(",");
-			for (int i = 0; i < services.length; i++) {
-				String pat = ((String) props.getCheckedProperty(PROP_PRE
-						+ services[i] + PROP_SERV_PATTERN));
+    /**
+     * {@inheritDoc}
+     */
+    public void init(FilterConfig config) throws ServletException {
+        String propFilePath = config.getInitParameter(PARAM_CONFIG_FILE);
+        if (propFilePath == null)
+            throw new ServletException(
+                    "Missing configuration file parameter (set in '"
+                            + PARAM_CONFIG_FILE + "' init param)");
+        // load properties
+        String propPath = config.getServletContext().getRealPath(
+                propFilePath);
 
-				try {
-					this.services.put(services[i], Pattern.compile(pat));
-				} catch (PatternSyntaxException e) {
-					throw new ServletException("Syntax error at Pattern '"
-							+ pat + "' :" + e.getMessage());
-				}
-			}
-			LOG.info("Filter initiated with properties from: " + propPath);
 
-			stager = new StagerDispatcher(props);
+        ExtendedProperties props;
+        try {
+            try {
+                props = new ExtendedProperties(propPath);
+            } catch (FileNotFoundException e1) {
+                throw new ServletException("Missing configuration file: "
+                        + propPath);
+            }
 
-		} catch (FileNotFoundException e) {
-			LOG.error("Filter properties not found (" + propPath + ")");
-			throw new ServletException("Filter properties not found ("
-					+ propPath + ")", e);
-		} catch (StagerException e) {
-			LOG.error("Error while creating the stager", e);
-			throw new ServletException("Error while creating the stager"
-					, e);
-		} catch (IOException e) {
-			LOG.error("Error accesing Filter properties (" + propPath + ")");
-			throw new ServletException("Error accesing Filter properties ("
-					+ propPath + ")", e);
-		}
+            String[] services = ((String) props.getCheckedProperty(PROP_PRE
+                    + PROP_SERV)).split(",");
+            for (int i = 0; i < services.length; i++) {
+                String pat = ((String) props.getCheckedProperty(PROP_PRE
+                        + services[i] + PROP_SERV_PATTERN));
 
-	}
+                try {
+                    this.services.put(services[i], Pattern.compile(pat));
+                } catch (PatternSyntaxException e) {
+                    throw new ServletException("Syntax error at Pattern '"
+                            + pat + "' :" + e.getMessage());
+                }
+            }
+            LOG.info("Filter initiated with properties from: " + propPath);
+
+            stager = new StagerDispatcher(props);
+
+        } catch (FileNotFoundException e) {
+            LOG.error("Filter properties not found (" + propPath + ")");
+            throw new ServletException("Filter properties not found ("
+                    + propPath + ")", e);
+        } catch (StagerException e) {
+            LOG.error("Error while creating the stager", e);
+            throw new ServletException("Error while creating the stager"
+                    , e);
+        } catch (IOException e) {
+            LOG.error("Error accesing Filter properties (" + propPath + ")");
+            throw new ServletException("Error accesing Filter properties ("
+                    + propPath + ")", e);
+        }
+
+    }
 
 }

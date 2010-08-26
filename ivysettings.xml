@@ -1,23 +1,23 @@
 <ivysettings>
       <property name="ivy.default.root.url" value="http://esgf.org/ivy" override="false"/>
       <settings defaultResolver="default-chain"/>
-      
+
       <!-- ESGF repository -->
       <include url="${ivy.default.root.url}/ivysettings-esgf.xml"/>
-      
+
       <!-- Third party libraries stored on ESGF system -->
       <include url="${ivy.default.root.url}/ivysettings-shared.xml"/>
-      
+
       <!-- Public Maven 2 repository -->
       <include url="${ivy.default.root.url}/ivysettings-public.xml"/>
 
       <!-- Public Javanet repository -->
       <include url="${ivy.default.root.url}/ivysettings-javanet.xml"/>
-      
+
       <!-- Shiboleth repository -->
       <!-- <include url="${ivy.default.root.url}/ivysettings-shiboleth.xml"/> -->
-      
+
       <include url="${ivy.default.root.url}/ivysettings-default-chain.xml"/>
-      
+
 </ivysettings>
 

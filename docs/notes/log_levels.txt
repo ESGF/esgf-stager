@@ -23,7 +23,7 @@ messages to the log:
     log.debug(Object message, Throwable t);
     log.trace(Object message);
     log.trace(Object message, Throwable t);
-              
+
 Semantics for these methods are such that it is expected that the
 severity, from highest to lowest, of messages is ordered as above. In
 addition to the logging methods, the following are provided for code
@@ -35,4 +35,4 @@ guards:
     log.isInfoEnabled();
     log.isDebugEnabled();
     log.isTraceEnabled();
-              
+
