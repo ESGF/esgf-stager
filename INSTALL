@@ -7,14 +7,16 @@
 #*****************************************************************
 
 INSTALL:
-
-Install as a tomcat Filter in the application web.xml  and provide the 
-"configurationFile" pointing to the configuration file (the path is relative 
-to the installed directory). 
+To install the Web Filter put the stager .jar file in the WEB-INF/lib directory 
+of staged application.
+ 
+Install as a tomcat Filter in the application web.xml and provide the parameter 
+"configurationFile" pointing to the configuration file locations (the path is 
+relative to the installed directory). 
 
 For example:
 
-    	<!-- HPSS Filter -->
+    	<!-- Stager Filter -->
 	<filter>
 		<filter-name>StagerFilter</filter-name>
 		<filter-class>esgf.node.stager.web.StagerFilter</filter-class>
