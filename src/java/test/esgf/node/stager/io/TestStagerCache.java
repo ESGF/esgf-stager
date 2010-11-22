@@ -79,6 +79,11 @@ public class TestStagerCache {
         assertEquals(testProps.getProperty("localDirectory"),
                 ((File) PrivilegedAccessor.getField(cache, "localDirectory"))
                         .getAbsolutePath());
+
+        assertEquals(testProps.isPropertySet("maxCacheSize"), 
+                PrivilegedAccessor.getField(cache, "limitCacheSize"));
+        assertEquals(testProps.isPropertySet("maxCacheFiles"), 
+                PrivilegedAccessor.getField(cache, "limitCacheFiles"));
         assertEquals(testProps.getProperty("maxCacheSize"), ""
                 + PrivilegedAccessor.getField(cache, "maxCacheSize"));
 

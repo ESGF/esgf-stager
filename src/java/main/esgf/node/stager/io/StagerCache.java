@@ -154,7 +154,7 @@ public class StagerCache {
 
             // Wake up all threads waiting on this.
             // note that if something went wrong the localFile will be
-            // null but inCache will be true.
+            // null and this entry will deleted from the cache.
             synchronized (this) {
                 notifyAll();
             }
@@ -190,7 +190,9 @@ public class StagerCache {
 
     private final File localDirectory;
     private long maxCacheSize;
+    private boolean limitCacheSize = false;
     private long maxCacheFiles;
+    private boolean limitCacheFiles = false;
     private FileGrabber fileGrabber;
 
     /**
@@ -208,31 +210,40 @@ public class StagerCache {
                 "Directory " + props.getProperty(PROP_LOCAL_DIR)
                         + " cannot be found."); }
 
-        // get cache size or take 80% of the available space.
-        //don'T aks me why 80%, it's just a nice number :-)
-        try {
-            maxCacheSize = props.getCheckedProperty(PROP_MAX_CACHE_SIZE, -1L);
+        // get cache size or take all of the available space.
+        limitCacheSize = props.isPropertySet(PROP_MAX_CACHE_SIZE);
+        if (limitCacheSize) {
+            try {
+                maxCacheSize = props.getCheckedProperty(PROP_MAX_CACHE_SIZE,
+                        -0L);
 
-            if (maxCacheSize < 0) {
-                maxCacheSize = (long) (localDirectory.getUsableSpace() * 0.8);
-                LOG.warn("Cache size not set, allocating up to 80%"
-                        + " of available space: " + (maxCacheSize >> 20)
-                        + "Mb.");
+                long available = localDirectory.getUsableSpace();
+
+                if (maxCacheSize == 0) {
+                    maxCacheSize = available;
+                    LOG.warn("Cache auto-sized, allocating max available space: "
+                            + (maxCacheSize >> 20) + "MB.");
+                } else if (maxCacheSize > available) {
+                    LOG.warn("The available space is lower than the one allocated.");
+                }
+
+            } catch (NumberFormatException e) {
+                LOG.error("Invalid cache_size value: "
+                        + props.getProperty("cache_size"));
+                throw e;
             }
-
-        } catch (NumberFormatException e) {
-            LOG.error("Invalid cache_size value: "
-                    + props.getProperty("cache_size"));
-            throw e;
         }
-
-        try {
-            maxCacheFiles = props.getCheckedProperty(PROP_MAX_CACHE_FILES,
-                    Long.MAX_VALUE);
-        } catch (NumberFormatException e) {
-            LOG.error("Invalid cache_max_files value: "
-                    + props.getProperty("cache_max_files"));
-            throw e;
+        
+        limitCacheFiles = props.isPropertySet(PROP_MAX_CACHE_FILES);
+        if (limitCacheFiles) {
+            try {
+                maxCacheFiles = props.getCheckedProperty(PROP_MAX_CACHE_FILES,
+                        Long.MAX_VALUE);
+            } catch (NumberFormatException e) {
+                LOG.error("Invalid cache_max_files value: "
+                        + props.getProperty("cache_max_files"));
+                throw e;
+            }
         }
 
         // setup grabber
@@ -325,7 +336,7 @@ public class StagerCache {
         if (target == null) throw new FileNotFoundException("Invalid Target:"
                 + origTarget);
 
-        // try a fast hit recognition before
+        // try a fast hit recognition before anything else
         CacheEntry e;
         synchronized (cache) {
             e = cache.get(target);
@@ -337,7 +348,7 @@ public class StagerCache {
                 // We don't check if the file was changed at the remote system
                 // in that case we expect the local one to be manually deleted
                 // and thus forced to be retrieved again.
-                if (f.exists()) { return f; }
+                if (f != null && f.exists()) { return f; }
             }
         }
 
@@ -416,17 +427,10 @@ public class StagerCache {
                 } else {
                     // no file, no entry this is the normal cache miss
                     if (!allocate(remoteFile.getSize())) {
-                        LOG.error(String.format("Could not allocate space "
-                                + "for file {cache{size:%d/%d,files:%d/%d}}}",
-                                cachedFilesSize, maxCacheSize, cache.size(),
-                                maxCacheFiles));
                         // We should signal the failure properly
                         throw new StagerException(Code.TEMPORARY_FAILURE,
                                 "Not enough room for file, try again later.");
                     }
-
-                    // increase cache used size
-                    cachedFilesSize += remoteFile.getSize();
 
                     // let the grabber work and call e.done callback when ready.
                     fileGrabber.grabLater(remoteFile, local, e);
@@ -538,30 +542,56 @@ public class StagerCache {
      */
     private boolean allocate(long size) {
         synchronized (cache) {
-            long required = cachedFilesSize + size - maxCacheSize;
+            //get the minimum available space (this is required only if we allow
+            //other
+            long maxUsableSize = limitCacheSize ? Math.min(
+                    localDirectory.getUsableSpace(), maxCacheSize)
+                    : localDirectory.getUsableSpace();
+            long available = maxUsableSize - cachedFilesSize - size;
 
-            while ((required > 0 || cache.size() > maxCacheFiles)
-                    && !orderedCacheEntries.isEmpty()) {
+            while (available < 0 || (limitCacheFiles && cache.size() > maxCacheFiles)) {
+                if (orderedCacheEntries.isEmpty()) {
+                    //we cannot solve this, should never happen though
+                    LOG.error("Not enough space and cache is empty.");
+                    return false;
+                }
+                
                 // we need to make place for this new file
+                //the next to be deleted is defined in the CacheEntry.compareTo()
+                //method.
                 CacheEntry ce = orderedCacheEntries.poll();
+                
+                //skip files in progress.
                 if (!ce.inCache) continue;
 
                 if (!ce.cachedFile.delete()) {
-                    // just try another (it might be still downloading)
+                    // just try another (it might be being downloaded)
                     continue;
                 }
 
+                //ok the file was removed. Remove the entry and free the space;
                 ce.remove();
                 cachedFilesSize -= ce.size;
-
-                required -= ce.size;
+                available += ce.size;
             }
-            if (required > 0 || cache.size() > maxCacheFiles) {
+            //check one last time to see if 
+            if (available < 0 || (limitCacheFiles && cache.size() > maxCacheFiles)) {
                 // we couldn't allocate it
+                LOG.error("Could not allocate space for file. {cache{size:"
+                        + cachedFilesSize
+                        + (limitCacheSize ? "/" + maxCacheSize : "/-")
+                        + ",files:" + cache.size()
+                        + (limitCacheFiles ? "/" + maxCacheFiles : "/-")
+                        + "}}}");
+
                 return false;
             }
+            
+            // increase cache used size before leaving the synchronization block
+            cachedFilesSize += size;
         }
-
+        
+        //everything went ok.
         return true;
     }
 
@@ -594,7 +624,6 @@ public class StagerCache {
                 cache.remove(ce.target);
                 cachedFilesSize -= ce.size;
             }
-
         }
     }
 
