@@ -164,7 +164,7 @@ public class ExtendedProperties extends Properties {
     }
 
     /**
-     * * Gets a property or its default value if no property was found. If the
+     * Gets a property or its default value if no property was found. If the
      * property wasn't found and no default value was provided an exception will
      * be thrown.
      *
@@ -207,5 +207,13 @@ public class ExtendedProperties extends Properties {
 
         }
         return (T)tmp;
+    }
+    
+    /**
+     * @param propName property name to look for.
+     * @return if the given property is set
+     */
+    public boolean isPropertySet(String propName) {
+        return getProperty(propName) != null;
     }
 }

@@ -1,6 +1,7 @@
 package esgf.node.stager.utils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -79,31 +80,59 @@ public class TestExtendedProperties {
         assertEquals(props.size(), ep3.size());
         assertEquals(props.entrySet(), ep3.entrySet());
     }
+    
+    /**
+     * IsPropertySet: check the method
+     */
+    @Test
+    public void testIsPropertySet() throws Exception {
+        ExtendedProperties ep = new ExtendedProperties(props);
+        assertFalse(ep.isPropertySet("NoSuchProperty"));
+        assertTrue(ep.isPropertySet(propKeys[0]));
+    }
 
     @Test
-    public void testRetrieval() throws Exception {
+    public void testGet() throws Exception {
         // turn off debugging
-        Logger.getLogger(ExtendedProperties.class).setLevel(Level.INFO);
+        Logger.getLogger(ExtendedProperties.class).setLevel(Level.OFF);
 
+        //more props
+        Object[][] someProps = new Object[][]{
+                new String[]{"int", "long", "float", "double", "boolean"},
+                new Object[]{5, 5000000000L, 1.5f, 123456790.0987654321, true},
+                //these are used as default to provide the method with the return type
+                new Object[]{1, 1L, 1.0f, 1.0, Boolean.FALSE},
+        };
+        for (int i = 0; i < someProps[0].length; i++) {
+            //we are adding the objects as strings to the properties
+            props.put((String)someProps[0][i], someProps[1][i].toString());
+        }
+        
         ExtendedProperties ep = new ExtendedProperties(props);
 
+        //test no default if we found something
         String val = "Yikes";
         assertEquals(propVals[0], ep.getCheckedProperty(propKeys[0], val));
 
+        //test nothing to get exception
         try {
             ep.getCheckedProperty("non-existent");
             fail("Should have thrown an exception.");
         } catch (StagerException e) {
             // ok
         }
-
-        //test different types
-        assertEquals(val, ep.getCheckedProperty("non-existent", val));
-        assertEquals(new Integer(1), ep.getCheckedProperty("non-existent", 1));
-        assertEquals(new Long(1), ep.getCheckedProperty("non-existent", 1L));
-        assertEquals(new Float(1.0f), ep.getCheckedProperty("non-existent", 1.0f));
-        assertEquals(new Double(1.0), ep.getCheckedProperty("non-existent", 1.0));
-        assertEquals(Boolean.TRUE, ep.getCheckedProperty("non-existent", true));
+        
+        
+        for (int i = 0; i < someProps[0].length; i++) {
+            //if found we should get the parsed object (same type!)
+            assertEquals(someProps[1][i], 
+                    ep.getCheckedProperty((String) someProps[0][i], someProps[2][i]));
+            
+            //not found we should get the defaults provided
+            assertEquals(someProps[2][i], 
+                    ep.getCheckedProperty("no_"+someProps[0][i], someProps[2][i]));
+        }
+        
 
     }
 
