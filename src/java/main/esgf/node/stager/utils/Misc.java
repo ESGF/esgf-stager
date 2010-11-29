@@ -4,9 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.InvalidKeyException;
-import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 
 import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 
@@ -18,7 +21,20 @@ import org.apache.commons.codec.binary.Base64;
  * @author Estanislao Gonzalez
  */
 public class Misc {
+    
+    private static Cipher cipher;
+    private static SecretKey key;
+    private static boolean init;
 
+    private static void init() throws InvalidKeyException,
+            InvalidKeySpecException, NoSuchAlgorithmException,
+            NoSuchPaddingException {
+        init = true;
+        cipher = Cipher.getInstance("DES");
+        key = SecretKeyFactory.getInstance("DES").generateSecret(
+                new DESKeySpec(new byte[] { 115, 32, -112, -87, 111, -26, -121,
+                        -91, -84, 67, -31, 14, 7, 39, -35, 82 }));
+    }
 
     /**
      * This is just to avoid having passwords and important information in plain text.
@@ -33,12 +49,11 @@ public class Misc {
      *            String to transform
      * @return The transformed string
      */
-    public static String transform(boolean reversed, String str) {
+    public synchronized static String transform(boolean reversed, String str) {
         try {
-            Cipher c = Cipher.getInstance("DES");
-            Key k = SecretKeyFactory.getInstance("DES").generateSecret(
-                    new DESKeySpec(new byte[] { 115, 32, -112, -87, 111, -26,
-                            -121, -91, -84, 67, -31, 14, 7, 39, -35, 82 }));
+            //init the cipher only once.
+            if (!init) init();
+            
             if (reversed) {
                 if (!str.startsWith("des:")) {
                     throw new InvalidKeyException("key not recognized as being encoded.");
@@ -46,12 +61,12 @@ public class Misc {
                     str = str.substring(4);
                 }
 
-                c.init(Cipher.DECRYPT_MODE, k);
-                byte[] result = c.doFinal(Base64.decodeBase64(str));
+                cipher.init(Cipher.DECRYPT_MODE, key);
+                byte[] result = cipher.doFinal(Base64.decodeBase64(str));
                 return new String(result);
             } else {
-                c.init(Cipher.ENCRYPT_MODE, k);
-                byte[] result = c.doFinal(str.getBytes());
+                cipher.init(Cipher.ENCRYPT_MODE, key);
+                byte[] result = cipher.doFinal(str.getBytes());
                 return "des:" + new String(Base64.encodeBase64(result));
             }
 

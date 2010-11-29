@@ -41,7 +41,7 @@ public class FTPConnector implements RemoteConnector {
         // to simplify parameter check
         if (config == null) config = new ExtendedProperties();
 
-        // HPSS Access parameters
+        // FTP Access parameters
         serverName = config.getCheckedProperty(PROP_SERV_NAME);
         serverPort = config.getCheckedProperty(PROP_SERV_PORT, 21);
         String tmp = config.getCheckedProperty(PROP_ROOT_DIR);
@@ -53,7 +53,7 @@ public class FTPConnector implements RemoteConnector {
         serverUserName = Misc.transform(true, (String) config
                 .getCheckedProperty(PROP_USER_NAME));
 
-        // don't write pass to log! and deobfuscate it.
+        // don't write password to log! and deobfuscate it.
         serverUserPass = Misc.transform(true, (String) config
                 .getCheckedProperty(false, PROP_USER_PASS));
 
