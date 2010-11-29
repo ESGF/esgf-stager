@@ -6,7 +6,9 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -19,11 +21,9 @@ import esgf.node.stager.utils.Misc;
 import esgf.node.stager.utils.MiscUtils;
 import esgf.node.stager.utils.PrivilegedAccessor;
 
-
-
 /**
  * Tests the HPSSGrabber class
- *
+ * 
  * @author Estanislao Gonzalez
  */
 public class TestFileGrabber {
@@ -31,28 +31,53 @@ public class TestFileGrabber {
 
     private static File tmpDir;
     private static String target1;
-    private static String dirTaget1;
+    private static String dirTarget1;
     private static String fileTarget1;
     private static String target2;
     private static ExtendedProperties testProps;
+
+    private static Date date1;
+
+    private static Date date2;
+
+    private static long size1;
+
+    private static long size2;
+
+    private static String dirTarget2;
+
+    private static String fileTarget2;
 
     @BeforeClass
     public static void setup() throws Exception {
         tmpDir = File.createTempFile("testHPSS", "");
         assertTrue(tmpDir.delete());
-        if (!tmpDir.mkdir())
-            fail("Could not create temporary directory.");
+        if (!tmpDir.mkdir()) fail("Could not create temporary directory.");
         LOG.info("Tmp dir created in: " + tmpDir.getAbsolutePath());
         tmpDir.deleteOnExit();
 
-        target1 = "/default_style.css";
-        dirTaget1 = "/";
+        SimpleDateFormat dFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+        dFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        // target dirs are intended to end with a slash
+        dirTarget1 = "/";
         fileTarget1 = "default_style.css";
-        target2 = "/DOCS/docs.old/zen.README";
+        target1 = dirTarget1 + fileTarget1;
+        // manually read from ftp with: modtime <file> and size <file>
+        date1 = dFormat.parse("09/06/2002 15:45:12 GMT");
+        size1 = 1512L;
 
-        //setup the grabber
+        // target dirs are intended to end with a slash
+        dirTarget2 = "/DOCS/docs.old/";
+        fileTarget2 = "zen.README";
+        target2 = dirTarget2 + fileTarget2;
+        // manually read from ftp with: modtime <file> and size <file>
+        date2 = dFormat.parse("03/20/1997 11:38:53 GMT");
+        size2 = 42L;
+
+        // setup the grabber
         testProps = new ExtendedProperties();
-        testProps.put("remoteConnectorFactory", "esgf.node.stager.io.connectors.FTPConnectorFactory");
+        testProps.put("remoteConnectorFactory",
+                "esgf.node.stager.io.connectors.FTPConnectorFactory");
         testProps.put("ftp.serverName", "ftp3.de.postgresql.org");
         testProps.put("ftp.serverPort", "21");
         testProps.put("ftp.serverRootDirectory", "pub/");
@@ -68,13 +93,13 @@ public class TestFileGrabber {
     /**
      * Checks the properties are properly read and an exception is thrown if not
      * properly set.
-     *
+     * 
      * @throws Exception
      */
     @Test
     public void testProperties() throws Exception {
         new FileGrabber(testProps);
-        //no exception should have been thrown.
+        // no exception should have been thrown.
 
         try {
             new FileGrabber(null);
@@ -86,6 +111,7 @@ public class TestFileGrabber {
 
     /**
      * tests the contents of the HPSSFile when retrieved from ftp.
+     * 
      * @throws Exception
      */
     @Test
@@ -102,47 +128,50 @@ public class TestFileGrabber {
         assertEquals(target1, hf.getTarget());
         assertEquals("/", hf.getDirectory());
         assertEquals(target1.substring(1), hf.getFilename());
-        assertEquals(1512, hf.getSize());
-        assertEquals(new Date(1031330712000L), hf.getLastMod());
+        assertEquals(size1, hf.getSize());
+        assertEquals(date1, hf.getLastMod());
         assertTrue(hf.exists());
 
         RemoteFile hf2 = g.getFileInfo(target1);
-        assertTrue(hf != hf2);			//differente objects
-        assertTrue(hf.equals(hf2));		//same content
+        assertTrue(hf != hf2); // differente objects
+        assertTrue(hf.equals(hf2)); // same content
 
-        //check other paths
-        hf = (RemoteFile)PrivilegedAccessor.instantiate(RemoteFile.class, "abc.nc");
+        // check other paths
+        hf = (RemoteFile) PrivilegedAccessor.instantiate(RemoteFile.class,
+                "abc.nc");
         assertEquals("abc.nc", hf.getTarget());
         assertEquals("/", hf.getDirectory());
         assertEquals("abc.nc", hf.getFilename());
 
-        hf = (RemoteFile)PrivilegedAccessor.instantiate(RemoteFile.class, "/abc.nc");
+        hf = (RemoteFile) PrivilegedAccessor.instantiate(RemoteFile.class,
+                "/abc.nc");
         assertEquals("/abc.nc", hf.getTarget());
         assertEquals("/", hf.getDirectory());
         assertEquals("abc.nc", hf.getFilename());
 
-        hf = (RemoteFile)PrivilegedAccessor.instantiate(RemoteFile.class, "/some/where/abc.nc");
+        hf = (RemoteFile) PrivilegedAccessor.instantiate(RemoteFile.class,
+                "/some/where/abc.nc");
         assertEquals("/some/where/", hf.getDirectory());
         assertEquals("abc.nc", hf.getFilename());
 
-        //now check the other params
+        // now check the other params
+        RemoteFile ff = g.getFileInfo(target2);
+        assertEquals(dirTarget2, ff.getDirectory());
+        assertEquals(fileTarget2, ff.getFilename());
 
-        RemoteFile ff = g.getFileInfo(target1);
-        assertEquals(dirTaget1, ff.getDirectory());
-        assertEquals(fileTarget1, ff.getFilename());
-
-        //this must be adapted when another test server is used.
-        assertEquals(1512, ff.getSize());
-        assertEquals(new Date(1031330712000L), ff.getLastMod());
+        // this must be adapted when another test server is used.
+        assertEquals(size2, ff.getSize());
+        assertEquals(date2, ff.getLastMod());
     }
 
     /**
      * grab a file from ftp.
+     * 
      * @throws Exception
      */
     @Test
     public void testGrabbing() throws Exception {
-        String[] files = new String[] {target1, target2};
+        String[] files = new String[] { target1, target2 };
         for (int i = 0; i < files.length; i++) {
             FileGrabber g = new FileGrabber(testProps);
             RemoteFile hf = g.getFileInfo(files[i]);
@@ -152,7 +181,7 @@ public class TestFileGrabber {
 
             LOG.info("Tmp file created: " + f.getAbsolutePath());
 
-            g.grabLater(hf, f, new Callback(){
+            g.grabLater(hf, f, new Callback() {
                 public void done(File localFile) {
                     LOG.info("Done with: " + localFile.getAbsolutePath());
                     synchronized (TestFileGrabber.this) {
@@ -161,22 +190,21 @@ public class TestFileGrabber {
                 }
             });
 
-            //should not be there
+            // should not be there
             assertEquals(0, f.length());
 
-            //wait until it is
+            // wait until it is
             synchronized (this) {
-                //...but don't wait for ever.
+                // ...but don't wait for ever.
                 this.wait(10000);
             }
 
-            //file should be there
+            // file should be there
             assertTrue(f.length() > 0);
-            //check we got what we expected
+            // check we got what we expected
             assertEquals(hf.getFilename(), f.getName());
             assertEquals(hf.getSize(), f.length());
             assertEquals(hf.getLastMod(), new Date(f.lastModified()));
-
 
             MiscUtils.showFile(f, LOG);
         }
@@ -185,13 +213,15 @@ public class TestFileGrabber {
 
     @Test
     public void testMassiveGrabbing() throws Exception {
-        //well we need a test server that allow multiple connections so this test will be "useful"
+        // well we need a test server that allow multiple connections so this
+        // test will be "useful"
         File[] tmpFiles = new File[3];
         for (int i = 0; i < tmpFiles.length; i++) {
             tmpFiles[i] = File.createTempFile("hpssCreationTest", null, tmpDir);
             tmpFiles[i].deleteOnExit();
 
-            System.out.println("Tmp file created: " + tmpFiles[i].getAbsolutePath());
+            System.out.println("Tmp file created: "
+                    + tmpFiles[i].getAbsolutePath());
 
             FileGrabber g = new FileGrabber(testProps);
 
@@ -200,7 +230,7 @@ public class TestFileGrabber {
 
         }
 
-        //the timing here might not work always
+        // the timing here might not work always
         Thread.sleep(3000);
         for (int i = 0; i < tmpFiles.length; i++) {
             assertTrue(tmpFiles[i].length() > 0);
@@ -223,8 +253,5 @@ public class TestFileGrabber {
 
         MiscUtils.showFile(f, LOG);
     }
-
-
-
 
 }

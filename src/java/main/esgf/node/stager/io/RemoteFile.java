@@ -81,7 +81,7 @@ public class RemoteFile {
     }
 
     /**
-     * Returns only the directory part of target.
+     * Returns only the directory part of target (it finishes always in a slash)
      * @return the directory
      */
     public String getDirectory() {
