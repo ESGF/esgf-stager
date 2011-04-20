@@ -63,7 +63,11 @@ public class TestFileGrabber {
         fileTarget1 = "default_style.css";
         target1 = dirTarget1 + fileTarget1;
         // manually read from ftp with: modtime <file> and size <file>
-        date1 = dFormat.parse("09/06/2002 15:45:12 GMT");
+        //ftp> modtime /pub/default_style.css
+        ///pub/default_style.css       09/06/2002 16:45:12 GMT
+        // was previously 15:45.... DST is changing the file timestamp!
+        //This shouldn't happen AFAIK if it's GMT.
+        date1 = dFormat.parse("09/06/2002 16:45:12 GMT");
         size1 = 1512L;
 
         // target dirs are intended to end with a slash
@@ -71,7 +75,9 @@ public class TestFileGrabber {
         fileTarget2 = "zen.README";
         target2 = dirTarget2 + fileTarget2;
         // manually read from ftp with: modtime <file> and size <file>
-        date2 = dFormat.parse("03/20/1997 11:38:53 GMT");
+        //ftp> modtime /pub/DOCS/docs.old/zen.README
+        ///pub/DOCS/docs.old/zen.README        03/20/1997 12:38:53 GMT
+        date2 = dFormat.parse("03/20/1997 12:38:53 GMT");
         size2 = 42L;
 
         // setup the grabber
@@ -129,6 +135,7 @@ public class TestFileGrabber {
         assertEquals("/", hf.getDirectory());
         assertEquals(target1.substring(1), hf.getFilename());
         assertEquals(size1, hf.getSize());
+        System.out.println(hf.getLastMod());
         assertEquals(date1, hf.getLastMod());
         assertTrue(hf.exists());
 
