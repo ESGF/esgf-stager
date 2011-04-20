@@ -46,7 +46,7 @@ public class TestFTPConnector {
         SimpleDateFormat dFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss 'GMT'");
         dFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         //manually read from ftp with: modtime <file>
-        remoteFileDate = dFormat.parse("09/06/2002 15:45:12 GMT");
+        remoteFileDate = dFormat.parse("09/06/2002 16:45:12 GMT");
         remoteFileName = "default_style.css";
         remoteFileDirectory = "/";
         
