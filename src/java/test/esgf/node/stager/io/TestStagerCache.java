@@ -57,7 +57,7 @@ public class TestStagerCache {
 
         testHPSStarget1 = "/default_style.css";
         testHPSStarget2 = "/DOCS/docs.old/zen.README";
-        testHPSSMediumTarget = "/fedora/linux/releases/12/Everything/i386/debug/vim-debuginfo-7.2.245-3.fc12.i686.rpm";
+        testHPSSMediumTarget = "/linux/kernel/v2.6/patch-2.6.32.gz";
     }
 
     @After
@@ -98,6 +98,7 @@ public class TestStagerCache {
                 "abc///test1.txt",
                 "abc/dfr/../test1.txt",
                 "abc/test1.txt",
+                "Utf-Rülß/../abc/test1.txt",
         };
         for (int i = 0; i < possibilities.length; i++) {
             assertEquals("Error on " + i + ") " + possibilities[i],
@@ -110,6 +111,7 @@ public class TestStagerCache {
                 "../otherpath/abc/test1.txt",
                 "abc/test1.txt\nalskdj",
                 "abc/test1.txt\0alskdj",
+                "abc/test1.txt\13alskdj",
         };
 
         for (int i = 0; i < misformed.length; i++) {
@@ -312,7 +314,7 @@ public class TestStagerCache {
         assertTrue(hpssFile2.exists());
 
         ExtendedProperties p = (ExtendedProperties)testProps.clone();
-        p.put("maxCacheSize", "" + (5 << 20));	//we need more space for this file
+        p.put("maxCacheSize", "" + ((1L << 20) * 75));	//we need more space for this file
         p.put("maxCacheFiles", "1");
 
         // test the grabber is properly setup
@@ -323,7 +325,7 @@ public class TestStagerCache {
 
         cache.retrieveFile(hpssFile1.getTarget(), false);
         try {
-            //no more room for f2! Only 1 file allowed!
+            //no more room for f2 and f1 should be still downloading and Only 1 file allowed!
             cache.retrieveFile(hpssFile2.getTarget(), true);
             fail("Shouldn't have been able to allocate it!");
         } catch (StagerException e) {
