@@ -3,6 +3,8 @@ package esgf.node.stager.io;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -429,7 +431,9 @@ public class StagerCache {
                     if (!allocate(remoteFile.getSize())) {
                         // We should signal the failure properly
                         throw new StagerException(Code.TEMPORARY_FAILURE,
-                                "Not enough room for file, try again later.");
+                                "Not enough room for file ("
+                                        + remoteFile.getSize()
+                                        + "), try again later.");
                     }
 
                     // let the grabber work and call e.done callback when ready.
@@ -497,7 +501,23 @@ public class StagerCache {
      * @return the canonical form of the path
      */
     private String canonizeTarget(String origTarget) {
-
+        try {
+            //remove double slashes and indirect references via URI, use dummy for protocol + server 
+            String path = new java.net.URI("nothig://nothing/" + origTarget).normalize().getPath();
+            
+            //this is canonized, but it might point outside root. Check this.
+            if (path.startsWith("/..")) return null;
+            
+            //last check for printable characters. Maybe not required, but still
+            for (int i = 0; i < path.length(); i++) {
+                if (path.charAt(i) < 32) return null;
+            }
+            
+            return path;
+        } catch (URISyntaxException e1) {
+            LOG.error("Can't normalize file.", e1);
+            return null;
+        }
         // String target = origTarget
         // .replace("./", "/") //remove current dir
         // .replaceAll("//+", "/") //remove extra slashes
@@ -509,29 +529,38 @@ public class StagerCache {
         // return target;
         // }
         //
+        
+           //this doesn't work on windows because canonizing a path implies using lowercase...
         // assure we have a relative path
-        String target = origTarget.replaceFirst("^/+", "");
-
-        // forbid special symbols (regex appears to have problem with \0)
-        if (!target.matches("^[^\\n\\r\\t\\f]+$") || target.contains("\0")) return null;
-
-        try {
-            // we better rely in Java for this, as we might evade some
-            // subtleness of the problem.
-            String current = new File(".").getCanonicalPath();
-            //assuming target lies in cache d !!!
-            String objective = new File(target).getCanonicalPath();
-            if (objective.length() < current.length()
-                    || !objective.startsWith(current)) {
-                // this is not the same directory as root.
-                return null;
-            }
-            // ok return the canonical path
-            return objective.substring(current.length());
-        } catch (IOException e) {
-            // this path is in any case bad.
-            return null;
-        }
+//        String target = origTarget.replaceFirst("^/+", "");
+//
+//        // forbid special symbols (regex appears to have problem with \0)
+//        if (!target.matches("^[^\\n\\r\\t\\f]+$") || target.contains("\0")) return null;
+//
+//        try {
+//            // we better rely in Java for this, as we might evade some
+//            // subtleness of the problem.
+//            String current = new File(".").getCanonicalPath();
+//            
+//            //assuming target lies in cache d !!!
+//            String objective = new File(target).getCanonicalPath();
+//            
+//            //Don't use any other file separator.
+//            if (File.separatorChar != '/') {
+//                current = current.replace(File.separatorChar, '/');
+//                objective = objective.replace(File.separatorChar, '/');
+//            }
+//            if (objective.length() < current.length()
+//                    || !objective.startsWith(current)) {
+//                // this is not the same directory as root.
+//                return null;
+//            }
+//            // ok return the canonical path
+//            return objective.substring(current.length());
+//        } catch (IOException e) {
+//            // this path is in any case bad.
+//            return null;
+//        }
     }
 
     /**
