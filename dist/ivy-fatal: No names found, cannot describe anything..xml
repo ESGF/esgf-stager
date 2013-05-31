@@ -1,0 +1,47 @@
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
+  <info organisation="org.esgf" module="esgf-srm" revision="fatal: No names found, cannot describe anything." status="milestone" publication="20130531141607"/>
+
+  <configurations>
+    <conf name="base" description="required for both compile and runtime"/>
+    <conf name="runtime" extends="base"/>
+    <conf name="compile" extends="base"/>
+    <conf name="test" extends="base" visibility="private"/>
+  </configurations>
+
+  <publications>
+    <artifact name="esgf-srm" type="war" conf="runtime"/>
+  </publications>
+
+  <dependencies>
+  
+	<dependency org="com.sun.xml.bind" name="jaxb-xjc" rev="2.2" conf="base->default"/>
+    <dependency org="log4j" name="log4j" rev="1.2.14" conf="base->default">
+      <exclude org="com.sun.jdmk"/>
+      <exclude org="com.sun.jmx"/>
+      <exclude org="javax.jms"/>
+    </dependency>
+    <dependency org="org.jdom" name="jdom" rev="1.1" transitive="true" conf="base->default"/>
+
+    <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.5.10" conf="base->default"/>
+
+    <dependency org="org.springframework" name="spring-context" rev="3.0.5.RELEASE" transitive="true" conf="base->default"/>
+    <dependency org="org.springframework" name="spring-web" rev="3.0.5.RELEASE" transitive="true" conf="base->default"/>
+    <dependency org="org.springframework" name="spring-webmvc" rev="3.0.5.RELEASE" transitive="true" conf="base->default"/>
+    <dependency org="org.springframework" name="spring-tx" rev="3.0.5.RELEASE" transitive="true" conf="base->default"/>
+    <dependency org="org.springframework" name="spring-aspects" rev="3.0.5.RELEASE" transitive="true" conf="base->default"/>
+	<dependency org="org.springframework" name="spring-oxm" rev="3.0.5.RELEASE" transitive="true" conf="base->default"/> 
+	<dependency org="org.springframework" name="spring-mock" rev="2.0-m5"/>
+
+    <dependency org="javax.servlet" name="servlet-api" rev="2.5" transitive="false" conf="compile->default"/>
+    <dependency org="javax.servlet" name="jstl" rev="1.2" conf="base->default"/>
+    
+    <dependency org="javax.mail" name="mail" rev="1.4.3" transitive="false" conf="base->default"/>
+    
+    <dependency org="org.esgf" name="esgf-node-manager" rev="0.6.14" revConstraint="latest.milestone" transitive="false" conf="base->runtime"/>
+    <dependency org="org.esgf" name="esgf-security" rev="2.3.11" revConstraint="latest.milestone" transitive="false" conf="base->default"/>
+    
+    <dependency org="commons-httpclient" name="commons-httpclient" rev="3.1" conf="base->default"/>
+    
+  </dependencies>
+</ivy-module>

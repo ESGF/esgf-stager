@@ -1,0 +1,32 @@
+#*****************************************************************
+#
+#   Description: Basic description of the project(s) and layout of the
+#   		project.
+#
+#*****************************************************************
+
+README:
+
+The Stager provides the means to transparently cache directory structures 
+located at a remote system into a local one. Remote files are cached locally 
+preserving the directory structure from the remote system.
+
+This allows the stager to work transparently in many scenarios.
+
+
+Servlets
+
+A provided implementation uses a Java web Filter for intercepting the file 
+requests targeted at servlets running locally. This calls are handled 
+differently depending on the user-agent attribute from the http request header.
+If the request was started from within a browser, the user will be sent some
+kind of feedback to let him/her know the procedure was triggered, e.g. by 
+redirecting him to a "waiting page" from where he/she will be automatically 
+redirected to the original servlet when the file is retrieved.
+In case the request was started by a tool, the request will just block until 
+the file is available.
+This differential procedure covers both kind of users' expectations.  
+
+The file retrieval will be triggered only once and if the file is already found 
+in the cache, the filter will let the request through without delay. 
+This call will be still logged to optimize the cache-cleaning mechanism. 

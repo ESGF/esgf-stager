@@ -1,0 +1,31 @@
+#*****************************************************************
+#
+#   Description: Installation instructions for software products
+#   		(See the documentaton in the "docs" directory for
+#		more detailed information)
+#
+#*****************************************************************
+
+INSTALL:
+To install the Web Filter put the stager .jar file in the WEB-INF/lib directory 
+of staged application.
+ 
+Install as a tomcat Filter in the application web.xml and provide the parameter 
+"configurationFile" pointing to the configuration file locations (the path is 
+relative to the installed directory). 
+
+For example:
+
+    	<!-- Stager Filter -->
+	<filter>
+		<filter-name>StagerFilter</filter-name>
+		<filter-class>esgf.node.stager.web.StagerFilter</filter-class>
+		<init-param>		
+			<param-name>configurationFile</param-name>
+			<param-value>/WEB-INF/stager.properties</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>StagerFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
