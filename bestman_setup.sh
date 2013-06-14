@@ -33,11 +33,23 @@
 
 
 
+
+export BESTMAN_HOME=${$1:-/usr/local/bestman2}
+export BESTMAN_DIST=bestman2-2.3.0.tar.gz
+export BESTMAN_URL=https://codeforge.lbl.gov/frs/download.php/402
+
 # 1 - Get bestman
+chdir /tmp
+wget ${BESTMAN_URL}/${BESTMAN_DIST}
 
 # 2 - untar into /usr/local and set the BESTMAN2_HOME variable
+mkdir -p ${BESTMAN_HOME}
+cd `dirname ${BESTMAN_HOME}`
+tar zxf /tmp/${BESTMAN_DIST}
 
 # 3 - run configure in BESTMAN2_HOME/setup
+cd ${BESTMAN_HOME}/setup
+configure
 
 # 4 - set the configuration parameters in BESTMAN2_HOME/conf/bestman2.rc and BESTMAN2_HOME/etc/bestman2 using the inputs
 
