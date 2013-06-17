@@ -1,0 +1,40 @@
+#!/bin/bash
+
+#####
+# esg-stager
+# Installs and configures SRM/Bestman stager for staging files from
+# deep storage (e.g., HPSS) to user facing disk for download.
+#****************************************************************************
+#*                                                                          *
+#*  Organization: Oak Ridge National Laboratory (ORNL)                      *
+#*   Directorate: Computing and Computational Sciences Directorate          *
+#*      Division: Center for Computational Sciences                         *
+#*         Group: Technology Integration                                    *
+#*       Program: CSSEF                                                     *
+#*       Project: Earth Systems Grid (ESG) Data Node Software Stack         *
+#*       Authors: Tom Barron (tbarron@ornl.gov)                             *
+#*                John Harney (harneyjf@ornl.gov)                           *
+#****************************************************************************
+#*
+#* License here?
+#*
+#****************************************************************************
+#####
+
+# Description: Installation of the esgf-stager component. Meant to be
+#              called by esg-node at install time.
+
+init() {
+}
+
+setup_stager() {
+}
+
+write_install_log() {
+}
+
+setup_srm() {
+}
+
+setup_bestman() {
+}

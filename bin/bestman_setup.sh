@@ -1,3 +1,4 @@
+#!/bin/bash
 #BESTMAN INSTALLATION SCRIPT
 #
 # The following are required inputs (given by user in the installation procedure)
