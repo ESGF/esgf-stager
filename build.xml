@@ -66,6 +66,13 @@ Builds the project via ant (obviously).
   <property name="filter" value="false"/>
   <property name="sign"   value="false"/>
   <property name="seal"   value="false"/>
+  <property file="etc/.${module}.ant.properties" />
+  <echo message="user property file ${user.home}/.${module}.ant.properties" />
+  <property file="${basedir}/etc/${module}.ant.properties" />
+  <echo message="user property file ${basedir}/etc/${module}.ant.properties" />
+
+  <property name="ivy_retrieve_type" value="jar, bundle"/>
+  <property name="filter" value="false" />
 
   <!-- **static defines** -->
   <property name="version_num" value="0.0.0"/>
@@ -258,6 +265,18 @@ Builds the project via ant (obviously).
   	    	</fileset>
   	      <pathelement path="${build_dir}"/>
   	    </path>
+    <ivy:resolve type="${ivy_retrieve_type}"/>
+    <ivy:retrieve sync="true" type="jar"/>
+    <path id="main_classpath">
+      <fileset dir="${lib_dir}">
+        <include name="**/*.jar" />
+        <exclude name="**/junit*.jar" />
+        <exclude name="**/*javadoc.jar" />
+        <exclude name="**/*sources.jar" />
+        <exclude name="${lib_fetched_dir}/source/*" />
+      </fileset>
+      <pathelement path="${build_dir}" />
+    </path>
 
     <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
         <classpath refid="compile.classpath"/>
