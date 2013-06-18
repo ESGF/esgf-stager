@@ -1,4 +1,4 @@
-package org.esgf.srm.utils;
+package org.esgf.stager.utils;
 
 public class Utils {
 

@@ -1,4 +1,4 @@
-package org.esgf.srm.email;
+package org.esgf.stager.email;
 
 public class Attachment {
 
