@@ -20,27 +20,27 @@ public class Bestman {
 	private SRMResp srm_response;
 	
 	public Bestman() {
-		System.out.println("First cons");
+		//System.out.println("First cons");
 		this.srm_request = new SRMReq();
 		this.srm_response = new SRMResp();
 	}
 	
 	public Bestman(SRMReq srm_request) {
-		System.out.println("Second cons");
+		//System.out.println("Second cons");
 		this.srm_request = srm_request;
 		this.srm_response = new SRMResp();
 		
 	}
 	
 	public Bestman(String [] file_urls) {
-		System.out.println("Third cons");
+		//System.out.println("Third cons");
 		this.srm_request = new SRMReq(file_urls);
 		this.srm_response = new SRMResp();
 	}
 
 	public void get() {
 
-	    System.out.println("IN GET()");
+	    //System.out.println("IN GET()");
 	    
 	    String message = "";
 
@@ -52,13 +52,15 @@ public class Bestman {
 	    	if(!this.srm_request.getStorageInfo().equals("")) {
 		       this.srm_request.setDelegationNeeded(true);
 		    }
-	    	System.out.println("\n\n\ttrying...");
+	    	//System.out.println("\n\n\ttrying...");
 		    System.out.println("CC Initialized");
+		    /*
 		    System.out.println(this.srm_request.getLog4jlocation());
 		    System.out.println(this.srm_request.getLogPath());
 		    System.out.println(this.srm_request.isDebug());
 		    System.out.println(this.srm_request.isDelegationNeeded());
-		    System.out.println("server: " + this.srm_request.getServer_url());
+		    */
+		    System.out.println("Server url: " + this.srm_request.getServer_url());
 		    
 		    
 		    
@@ -68,8 +70,8 @@ public class Bestman {
 		    							 this.srm_request.isDelegationNeeded());
 		    
 		    //System.out.println("Credential name: " + cc.getCredential().getName());
-		    //System.out.println("Server url: " + this.srm_request.getServer_url());
-		    System.out.println("server: " + this.srm_request.getServer_url());
+		    System.out.println("Server url: " + this.srm_request.getServer_url());
+		    //System.out.println("server: " + this.srm_request.getServer_url());
 		    
 //		    outLogFile.write("CC Initialized"+"\n");
 		    cc.connect(this.srm_request.getServer_url());
@@ -148,7 +150,7 @@ public class Bestman {
 		    	
 		    	
 		    	System.out.println("\nStatus.code="+response.getReturnStatus().getStatusCode());
-		        System.out.println("\nStatus.exp="+response.getReturnStatus().getExplanation());
+		        //System.out.println("\nStatus.exp="+response.getReturnStatus().getExplanation());
 		        
 		    	if(response.getReturnStatus().getStatusCode() == TStatusCode.SRM_SUCCESS ||
     	          response.getReturnStatus().getStatusCode() == TStatusCode.SRM_FILE_PINNED) {
@@ -167,11 +169,11 @@ public class Bestman {
 		    				
 		    				System.out.println("\nTransferSURL="+uri);
 		    				
-		    				System.out.println("\tTURL: " + fileStatus.getTURL());
+		    				//System.out.println("\tTURL: " + fileStatus.getTURL());
 		    				//org.apache.axis.types.URI uri2 = fileStatus.getTURL();
 		    				
 		    				//System.out.println("\nTURL="+uri2);
-		    				System.out.println("Pin Time:"+fileStatus.getPinLifeTime());	
+		    				//System.out.println("Pin Time:"+fileStatus.getPinLifeTime());	
 		    				retStr += (uri.toString()+";");	//Return value
     	                //response_file_urls[j] = uri.toString();
 		    			}
@@ -187,26 +189,27 @@ public class Bestman {
 		    	
 		    }
 		    
-		    System.out.println("ReturnStr: " + retStr);
+		    //System.out.println("ReturnStr: " + retStr);
 			
 			if(retStr != null) {
 				String [] response_urls = retStr.split(";");
 				
 				this.srm_response.setResponse_urls(response_urls);
-				message = "Doing fine";
+				message = SRMUtils.RESPONSE_MESSAGE;
 				
 			}
 			
 		    
 		    
 	    } catch(Exception e) {
-	    	System.out.println("\n\n\tping failed...");
+	    	System.out.println("\n\n\n\n\n\n\tcommunication with BESTMAN failed...\n\n\n\n");
 	    	e.printStackTrace();
 	    }
 
 	    
 	    System.out.println("END GET()");
 	    
+	    System.out.println("MESSAGE: " + message);
 		this.srm_response.setMessage(message);
 		
 	}

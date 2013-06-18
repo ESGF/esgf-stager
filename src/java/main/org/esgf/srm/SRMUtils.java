@@ -10,8 +10,10 @@ public class SRMUtils {
 	
 	public static String SRM_CACHE_REPLACE = "/SRMTemp/";
 
-    public static String srmAPIURL = "http://localhost:8080/esg-srm/service/srmrequest?";
+    public static String srmAPIURL = "http://localhost:8080/esgf-stager/service/srmrequest?";
 	
+    public static String RESPONSE_MESSAGE = "Request Completed";
+    
     public static String [] gridftp2httpArr(String [] grid_ftp_arr) {
     	String [] http_arr = new String[grid_ftp_arr.length];
 

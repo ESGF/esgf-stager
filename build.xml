@@ -27,9 +27,9 @@ Description:
 Builds the project via ant (obviously).
 -->
 
-<project name="esgf-srm" default="make" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="esgf-stager" default="make" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
   
-  <property name="module" value="esgf-srm"/>
+  <property name="module" value="esgf-stager"/>
   <property name="organization" value="Earth Systems Grid Federation"/>
   
   <!--

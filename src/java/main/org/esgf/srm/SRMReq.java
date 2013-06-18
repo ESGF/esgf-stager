@@ -19,7 +19,7 @@ public class SRMReq {
     public SRMReq() {
     	this.uid = "";
     	this.logPath = "/tmp/esg-srm.log";
-    	this.log4jlocation = "";
+    	this.log4jlocation = "/tmp/esg-srm.log";
     	String ttemp = System.getProperty("log4j.configuration");
 	    //System.out.println("ttemp = "+ ttemp);
 	    if(ttemp != null && !ttemp.equals("")) {
