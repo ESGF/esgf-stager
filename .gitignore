@@ -1,22 +1,14 @@
-<<<<<<< HEAD
-.settings/*
-.classpath
-.project
-=======
+
 #****************************************************************
 #     Files that git should ignore...
 #****************************************************************
 
->>>>>>> fb705af2308303fa0f20329282637654bc961547
 TAGS
 .ant-targets-build.xml
 *~
 *.cache
 *.DS_Store
-<<<<<<< HEAD
 .settings/org.eclipse.jdt.ui.prefs
-=======
->>>>>>> fb705af2308303fa0f20329282637654bc961547
 *.a
 *.o
 *.class
@@ -30,7 +22,6 @@ generated/
 /dist
 /docs-generated
 /lib/fetched
-<<<<<<< HEAD
 /.cobertura.ser
 /eclipse
 /backup
@@ -53,4 +44,4 @@ bin/post.manif
 /eclipse-build
 /local_build.xml
 /eclipse-bin
->>>>>>> fb705af2308303fa0f20329282637654bc961547
+
