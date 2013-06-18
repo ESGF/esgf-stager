@@ -3,7 +3,7 @@
             xsi:noNamespaceSchemaLocation=
                       "http://ant.apache.org/ivy/schemas/ivy.xsd">
 
-  <info organisation="org.esgf" module="esgf-srm"/>
+  <info organisation="org.esgf" module="esgf-stager"/>
 
   <configurations>
     <conf name="base" description="required for both compile and runtime" />
@@ -13,7 +13,7 @@
   </configurations>
 
   <publications>
-    <artifact name="esgf-srm" type="war" conf="runtime" />
+    <artifact name="esgf-stager" type="war" conf="runtime" />
   </publications>
 
   <dependencies>

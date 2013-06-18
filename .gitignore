@@ -1,3 +1,4 @@
+
 #****************************************************************
 #     Files that git should ignore...
 #****************************************************************
@@ -7,6 +8,7 @@ TAGS
 *~
 *.cache
 *.DS_Store
+.settings/org.eclipse.jdt.ui.prefs
 *.a
 *.o
 *.class
@@ -20,6 +22,18 @@ generated/
 /dist
 /docs-generated
 /lib/fetched
+/.cobertura.ser
+/eclipse
+/backup
+target/
+.externalToolBuilders/
+.springBeans
+
+################################
+#Generated from templated files
+################################
+bin/post.manif
+=======
 /.classpath
 /.project
 /cobertura.ser
@@ -30,3 +44,4 @@ generated/
 /eclipse-build
 /local_build.xml
 /eclipse-bin
+
