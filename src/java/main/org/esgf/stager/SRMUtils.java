@@ -1,4 +1,4 @@
-package org.esgf.srm;
+package org.esgf.stager;
 
 import java.io.File;
 import java.net.MalformedURLException;

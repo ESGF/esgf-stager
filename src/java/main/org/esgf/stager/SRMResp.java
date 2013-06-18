@@ -1,4 +1,4 @@
-package org.esgf.srm;
+package org.esgf.stager;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -11,6 +11,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.esgf.stager.utils.XmlFormatter;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.w3c.dom.Document;

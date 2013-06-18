@@ -1,4 +1,4 @@
-package org.esgf.srm.email;
+package org.esgf.stager.email;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,7 +20,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.esgf.srm.SRMUtils;
 
 import esg.common.util.ESGFProperties;
 

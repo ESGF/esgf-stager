@@ -1,4 +1,4 @@
-package org.esgf.srm;
+package org.esgf.stager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,9 +16,8 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.esgf.srm.email.Attachment;
-import org.esgf.srm.email.Email;
-import org.esgf.srm.utils.Utils;
+import org.esgf.stager.utils.Utils;
+import org.esgf.stager.utils.XmlFormatter;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.stereotype.Controller;
@@ -55,6 +54,8 @@ public class SRMRequestController {
 		for(Object key : request.getParameterMap().keySet() ) {
 			System.out.println("Key: " + (String) key);
 		}
+		
+		
 		
 		//grab params
 		System.out.println("In HTTP POST: addSRMRequest");
@@ -114,7 +115,7 @@ public class SRMRequestController {
 			}
 		}
 		
-		/*
+		
 		try {
 			this.bestman = new Bestman(file_urls);
 			if(isProduction) {
@@ -132,7 +133,7 @@ public class SRMRequestController {
 			System.out.println("Exception triggered in SRMRequestController");
 			e.printStackTrace();
 		}
-		*/
+		
 		
 		System.out.println("Returning...");
 			

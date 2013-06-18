@@ -1,4 +1,4 @@
-package org.esgf.srm;
+package org.esgf.stager;
 
 public class SRMReq {
 	
