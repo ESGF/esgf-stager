@@ -42,9 +42,11 @@ Builds the project via ant (obviously).
   <echo message="user property file ${user.home}/.${module}.ant.properties"/>
   <property file="${user.home}/.esgf.ant.properties"/>
   <echo message="user property file ${user.home}/.esgf.ant.properties"/>
-  <property file="${basedir}/etc/${module}.ant.properties"/> 
-  <echo message="user property file ${basedir}/etc/${module}.ant.properties"/>
-
+	<!--
+	<property file="${basedir}/etc/${module}.ant.properties"/> 
+  
+	<echo message="user property file ${basedir}/etc/${module}.ant.properties"/>
+  -->
   <exec executable="bash" dir="${basedir}" outputproperty="version_num">
     <arg value="-c"/>
     <arg value="git describe | sed -n 's/v\([a-zA-Z0-9.]*\)[-]*.*/\1/p'"/>
@@ -232,10 +234,12 @@ Builds the project via ant (obviously).
   </target>
   
   <target name="deps" depends="init-ivy" description="(Sets up library dependencies: Ivy)">
-  	<echo message="--------DELETING BUILD DIRECTORY (if exists)---------"/> 
+  	<!--
+  	<echo message="DELETING BUILD DIRECTORY (if exists)"/> 
   	<delete>
   		<fileset dir="${build_dir}" includes="**/*.bak" />
   	</delete>
+  	-->
     <mkdir dir="${lib_fetched_dir}" />
     <mkdir dir="${lib_compile_dir}" />
     <mkdir dir="${lib_runtime_dir}" />
@@ -319,7 +323,7 @@ Builds the project via ant (obviously).
     </javac>
 
     <copy todir="${build_dir}" filtering="${filter}" overwrite="true">
-      <fileset dir="${conf_dir}" includes="**/*.properties,**/*.template,**/*filter-web.xml"/>
+      <!-- <fileset dir="${conf_dir}" includes="**/*.properties,**/*.template,**/*filter-web.xml"/> -->
       <fileset dir="${src_dir}" includes="**/*.properties,**/*.template,**/*.xml,**/*.txt"/>
     </copy> 
 
@@ -392,11 +396,11 @@ Builds the project via ant (obviously).
   	      <fileset dir="${lib_bestman_dir}" includes="*.jar" />
   	    	<!-- <fileset dir="${lib_bestman_dir}" includes="**/*.class" /> -->
   	    </copy>
-  	
+  	<!--
   	<copy todir="${build_dir}" overwrite="true" >
-  	  <fileset dir="${etc_dir}" />	
+  	   <fileset dir="${etc_dir}" />	
   	</copy>
-  	
+  	-->
   	
     <delete file="${dist_dir}/${module}.war"/>
       
