@@ -1,0 +1,35 @@
+#!/bin/bash
+
+source esg-stager
+
+while getopts Gb:c: flag; do
+    case $flag in
+        b)
+            local bestman_path=$OPTARG
+            echo "BESTMAN_PATH = $bestman_path"
+        ;;
+        c)
+            local hpss_proxy_certificate_location=$OPTARG
+            echo "hpss_proxy_certificate_location = $hpss_proxy_certificate_location"
+        ;;
+        G)
+            gridftp_restart=1
+            echo "Will restart gridftp"
+        ;;
+    esac
+done
+
+cmd="setup_stager"
+if [[ $bestman_path ]]; then
+   cmd="$cmd -b $bestman_path"
+fi
+if [[ $hpss_proxy_certificate_location ]]; then
+   cmd="$cmd -c $hpss_proxy_certificate_location"
+fi
+if [[ $gridftp_restart ]]; then
+   cmd="$cmd -G"
+fi
+
+echo $cmd
+$cmd
+
