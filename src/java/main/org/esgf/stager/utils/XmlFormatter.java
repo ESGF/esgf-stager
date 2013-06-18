@@ -1,4 +1,4 @@
-package org.esgf.srm.utils;
+package org.esgf.stager.utils;
 
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;

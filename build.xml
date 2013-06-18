@@ -232,7 +232,10 @@ Builds the project via ant (obviously).
   </target>
   
   <target name="deps" depends="init-ivy" description="(Sets up library dependencies: Ivy)">
-
+  	<echo message="--------DELETING BUILD DIRECTORY (if exists)---------"/> 
+  	<delete>
+  		<fileset dir="${build_dir}" includes="**/*.bak" />
+  	</delete>
     <mkdir dir="${lib_fetched_dir}" />
     <mkdir dir="${lib_compile_dir}" />
     <mkdir dir="${lib_runtime_dir}" />
