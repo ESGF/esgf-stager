@@ -25,16 +25,123 @@
 #              called by esg-node at install time.
 
 init() {
+    echo $*
 }
 
 setup_stager() {
+    echo setup_srm $*
+    setup_srm $*
 }
 
 write_install_log() {
+    echo $*
 }
 
 setup_srm() {
+    # handle arguments
+    while getopts Gb:c: flag; do
+        case $flag in
+            b)
+                local bestman_path=$OPTARG
+                echo "BESTMAN_PATH = $bestman_path"
+            ;;
+            c)
+                local hpss_proxy_certificate_location=$OPTARG
+                echo "hpss_proxy_certificate_location = $hpss_proxy_certificate_location"
+            ;;
+            G)
+                gridftp_restart=1
+                echo "Will restart gridftp"
+            ;;
+        esac
+    done
+
+    # 1 - Bestman setup
+    setup_bestman -b $bestman_path
+
+    # 2 - Copy the esg2-sdnn1 certificate into /etc/grid-security/certificates
+    if [[ -e $hpss_proxy_certificate_location ]]; then
+        cp $hpss_proxy_certificate_location/* /etc/grid-security/certificates
+    fi
+
+    # 3 - Set the ports for globus (i.e. call esg-gridftp-restart)
+    if [[ $griftp_restart ]]; then
+        sh /usr/local/bin/esg-gridftp-restart
+    fi
+
+    # 4 - Obtain a certificate via myproxy-logon (using globus services)
+    # $GLOBUS_HOME/bin/myproxy-logon -s esg -l <username>
+    # NOTE: certificate must be for user "tomcat" 
+    # (i.e. /tmp/x509uxxx where xxx is the tomcat user on the system)
+
+
+
+    # 5 - Set CLASSPATH for tomcat (to be used with Bestman and Axis)
+
+    # 6 - Write the srm.properties file (for front end)
+
+    # 7 - Create new schema in postgres
+    #
+    # file_id varchar(128),dataset_id varchar(128),timeStamp varchar(128), 
+    # expiration varchar(128), bestmanNumber varchar(128), 
+    # primary key (file_id,dataset_id));
+    #
+
+    # 8 - Pull esgf-stager from repo
+    cd /usr/local/src
+    if [[ ! -d /usr/local/src/esgf-stager ]] ; then
+      /usr/local/git/bin/git clone https://github.com/ESGF/esgf-stager.git
+    fi
+    cd esgf-stager
+    /usr/local/git/bin/git checkout devel-newStager
+    /usr/local/ant/bin/ant make_war
+
+    # 9 - Deploy in tomcat
+
 }
 
 setup_bestman() {
+
+    local localdir=`pwd`
+    local bestman_parent=/usr/local
+    local bestman_dist=bestman2-2.3.0.tar.gz
+    local bestman_url=https://codeforge.lbl.gov/frs/download.php/402
+
+    while getopts b: option; do
+       case $option in
+           b)  
+               local bestman_parent=$OPTARG
+           ;;
+           ?)  
+               echo "invalid option: $flag"
+               exit 1
+           ;;
+
+       esac
+    done
+
+    # 1 - Get bestman
+    cd /tmp
+    wget ${bestman_url}/${bestman_dist
+
+    # 2 - untar into /usr/local/and set the BESTMAN2_HOME variable
+    mkdir -p ${bestman_parent}
+    cd ${bestman_parent}
+    tar zxf /tmp/${bestman_dist}
+
+    # 3 - run configure in BESTMAN2_HOME/setup
+    cd ${bestman_parent}/bestman2/setup
+
+    ./configure
+
+    # 4 - set the configuration parameters in BESTMAN2_HOME/conf/bestman2.rc and BESTMAN2_HOME/etc/bestman2 using the inputs
+    # TODO: Need to identify the parameters to be customized from inputs
+    # another option would be to use awk or sed to do this edit
+
+    awk -f ${localdir}/bestman2_rc_edits.awk < bestman2.rc.samples > bestman2.rc
+
+    # 5 - write grid-mapfile and save to $GridMapFileName (see above)
+
+    # 6 - start bestman
+
 }
