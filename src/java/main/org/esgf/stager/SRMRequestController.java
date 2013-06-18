@@ -16,8 +16,6 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.esgf.stager.email.Attachment;
-import org.esgf.stager.email.Email;
 import org.esgf.stager.utils.Utils;
 import org.esgf.stager.utils.XmlFormatter;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -58,7 +56,7 @@ public class SRMRequestController {
 		}
 		
 		
-		/*
+		
 		//grab params
 		System.out.println("In HTTP POST: addSRMRequest");
 		
@@ -136,7 +134,7 @@ public class SRMRequestController {
 			e.printStackTrace();
 		}
 		
-		*/
+		
 		System.out.println("Returning...");
 			
 		if(srm_response == null) {
