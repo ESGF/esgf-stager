@@ -1,6 +1,8 @@
-.settings/*
-.classpath
-.project
+
+#****************************************************************
+#     Files that git should ignore...
+#****************************************************************
+
 TAGS
 .ant-targets-build.xml
 *~
@@ -31,3 +33,15 @@ target/
 #Generated from templated files
 ################################
 bin/post.manif
+=======
+/.classpath
+/.project
+/cobertura.ser
+/docs-generated
+/dist
+/build
+/logs
+/eclipse-build
+/local_build.xml
+/eclipse-bin
+
