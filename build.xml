@@ -467,4 +467,7 @@ Builds the project via ant (obviously).
   </target>
 
 
+  <target name="test" description="Placeholder for future tests">
+  </target>
+
 </project>
