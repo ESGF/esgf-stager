@@ -1,4 +1,4 @@
-package org.esgf.srm;
+package org.esgf.stager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +19,7 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.esgf.srm.email.Attachment;
 import org.esgf.srm.email.Email;
 import org.esgf.srm.utils.Utils;
+import org.esgf.srm.utils.XmlFormatter;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.stereotype.Controller;
