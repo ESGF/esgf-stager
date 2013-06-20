@@ -32,7 +32,6 @@ done
 clean $bestman_path/bestman2
 clean /tmp/bestman2-2.3.0.tar.gz
 clean /usr/local/src/esgf-stager
-exit
 
 cmd="setup_stager"
 if [[ $bestman_path ]]; then
