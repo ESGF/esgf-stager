@@ -57,7 +57,7 @@ setup_srm() {
     done
 
     # 1 - Bestman setup
-    setup_bestman -b $bestman_path
+    runcmd setup_bestman -b $bestman_path
 
     # 2 - Copy the esg2-sdnn1 certificate into /etc/grid-security/certificates
     if [[ -e $hpss_proxy_certificate_location ]]; then
@@ -66,7 +66,7 @@ setup_srm() {
 
     # 3 - Set the ports for globus (i.e. call esg-gridftp-restart)
     if [[ $griftp_restart ]]; then
-        sh /usr/local/bin/esg-gridftp-restart
+        gridftp-restart
     fi
 
     # 4 - Obtain a certificate via myproxy-logon (using globus services)
@@ -101,47 +101,94 @@ setup_srm() {
 }
 
 setup_bestman() {
-
     local localdir=`pwd`
-    local bestman_parent=/usr/local
+    local bestman_parent=${bestman_path:-/usr/local}
+    local bm_path=${bestman_parent}/bestman2
     local bestman_dist=bestman2-2.3.0.tar.gz
     local bestman_url=https://codeforge.lbl.gov/frs/download.php/402
 
-    while getopts b: option; do
-       case $option in
-           b)  
-               local bestman_parent=$OPTARG
-           ;;
-           ?)  
-               echo "invalid option: $flag"
-               exit 1
-           ;;
-
-       esac
-    done
-
     # 1 - Get bestman
-    cd /tmp
-    wget ${bestman_url}/${bestman_dist
+    runcmd cd /tmp
 
-    # 2 - untar into /usr/local/and set the BESTMAN2_HOME variable
-    mkdir -p ${bestman_parent}
-    cd ${bestman_parent}
-    tar zxf /tmp/${bestman_dist}
+    # remove any old tarball sitting around
+    if [[ -e ${bestman_dist} ]]; then
+        runcmd rm ${bestman_dist}
+    fi
+
+    # fetch it
+    runcmd wget ${bestman_url}/${bestman_dist}
+
+    # 2 - untar into $bestman_parent and set the BESTMAN2_HOME variable
+    # NOTE: We have to create directory ${bm_path}/dist for configure to work, so 
+    #       we do that here
+    runcmd mkdir -p ${bm_path}/dist
+
+    runcmd cd ${bestman_parent}
+
+    runcmd tar zxf /tmp/${bestman_dist}
 
     # 3 - run configure in BESTMAN2_HOME/setup
-    cd ${bestman_parent}/bestman2/setup
-
+    # configure fails because of not finding axis 1.4. Do we need to fetch
+    #   that from somewhere?
+    runcmd cd ${bm_path}/setup
     ./configure
 
-    # 4 - set the configuration parameters in BESTMAN2_HOME/conf/bestman2.rc and BESTMAN2_HOME/etc/bestman2 using the inputs
-    # TODO: Need to identify the parameters to be customized from inputs
-    # another option would be to use awk or sed to do this edit
-
-    awk -f ${localdir}/bestman2_rc_edits.awk < bestman2.rc.samples > bestman2.rc
+#     # 4 - set the configuration parameters in BESTMAN2_HOME/conf/bestman2.rc and BESTMAN2_HOME/etc/bestman2 using the inputs
+#     # TODO: Need to identify the parameters to be customized from inputs
+#     # another option would be to use awk or sed to do this edit
+# 
+    runcmd cd ../conf
+    runcmd awk -f ${localdir}/bestman2_rc_edits.awk < bestman2.rc.samples > bestman2.rc
 
     # 5 - write grid-mapfile and save to $GridMapFileName (see above)
 
     # 6 - start bestman
 
+    runcmd cd $localdir
 }
+
+gridftp_restart() {
+    PIDS=`ps -ef | grep -v grep | grep -- "globus-gridftp-server" \
+         | awk '{ printf "%s ", $2; }'`
+    echo $PIDS
+    if [[ "$PIDS" != "" ]]; then
+        kill -9 $PIDS
+    fi
+
+    . /etc/esg.env
+    local X509_CERT_DIR=/etc/grid-security/certificates
+    local GLOBUS_TCP_PORT_RANGE=50000,51000
+    local GLOBUS_TCP_SOURCE_RANGE=50000,51000
+    local GSI_AUTHZ_CONF=/etc/grid-security/gsi-authz.conf
+    local GLOBUS_USAGE_DEBUG=MESSAGES,/esg/log/esg-server-usage-gridftp.log
+
+    export GLOBUS_GSI_AUTHZ_DEBUG_LEVEL=2
+    export GLOBUS_GSI_AUTHZ_DEBUG_FILE=/tmp/GFTPAUTHLOG
+    local JAVA_HOME=/usr/local/java
+
+    local LOGFILE=/var/log/gridftp-esg
+    echo "* * * Restarting servers at `date \"+%Y.%m%d %H:%M:%S\"`" >> $LOGFILE
+
+    #CHROOT="-chroot-path /lustre/esgfs"
+    #CHROOT="-chroot-path /esg/gridftp_root"
+
+    echo "CHROOT: '$CHROOT'"
+
+    CMD="/usr/local/globus/sbin/globus-gridftp-server \
+        -no-cas $CHROOT -d ALL -l $LOGFILE"
+
+    nohup $CMD -p 2811 >> $LOGFILE 2>&1 &
+
+    nohup $CMD -p 2812 >> $LOGFILE 2>&1 &
+}
+
+runcmd() {
+    echo "$*"
+    $*
+    local status=$?
+    if [[ $status != 0 ]]; then
+        echo "'$*' failed"
+        exit $status
+    fi
+}
+
