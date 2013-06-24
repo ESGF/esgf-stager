@@ -16,6 +16,8 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+//import org.esgf.singleton2.Bestman;
+import org.esgf.singleton2.GetBestman;
 import org.esgf.stager.utils.Utils;
 import org.esgf.stager.utils.XmlFormatter;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -47,19 +49,55 @@ public class SRMRequestController {
 	private String file_request_type;
 	private String openid;
 	
-	@RequestMapping(method=RequestMethod.POST, value="/srmrequest")
+	public static boolean firstThread = true;
+	
+	
+	@RequestMapping(method=RequestMethod.POST, value="/multithreadtest")
 	//public ModelAndView addEmployee(@RequestBody String body) {
-	public @ResponseBody String addSRMRequest(HttpServletRequest request,final HttpServletResponse response) {
+	public @ResponseBody String doMultithreadTest(HttpServletRequest request,final HttpServletResponse response) {
+	
+		
+		/*
+		System.out.println("doing multithreadtest");
+		
+		//thread 1
+        Runnable getBestman = new GetBestman(request,response);
+        
+        
+        //thread 2
+        Runnable getBestmanAgain = new GetBestman(request,response);
+        
+        // Call for the code in the method run to execute
+                 
+        new Thread(getBestman).start();
+        new Thread(getBestmanAgain).start();
+         */
+		
+		this.addSRMRequest(request, response);
+	
+		return "done";
+	}
+	
+	@RequestMapping(method=RequestMethod.POST, value="/srmrequest3")
+	//public ModelAndView addEmployee(@RequestBody String body) {
+	public @ResponseBody String addSRMRequest3(HttpServletRequest request,final HttpServletResponse response,String thread_id) {
+	
+	
+		/*
+		for(Object key : request.getParameterMap().keySet() ) {
+			System.out.println("Key: " + (String) key);
+		}
+		*/
 		
 		for(Object key : request.getParameterMap().keySet() ) {
 			System.out.println("Key: " + (String) key);
 		}
-		
-		
-		
+
+
+
 		//grab params
-		System.out.println("In HTTP POST: addSRMRequest");
-		
+		System.out.println("In HTTP POST: addSRMRequest3 for thread_id: " + thread_id + "\n\n\n");
+
 		String openid = request.getParameter("openid");
 		if(openid == null) {
 			this.openid = "jfharney";
@@ -71,7 +109,7 @@ public class SRMRequestController {
 		if(length == null) {
 			length = "1";
 		}
-		
+
 		String file_request_type = request.getParameter("file_request_type");
 		if(file_request_type == null) {
 			this.file_request_type = "http";
@@ -85,19 +123,18 @@ public class SRMRequestController {
 		} else {
 			this.file_request_type = "http";
 		}
+
+
+
+		String [] file_urls = null;
 		
-		
-		
-		String [] file_urls = null; 
-		
-		System.out.println("Length: " + length);
 		
 		if(length.equals("1")) {
 			file_urls = new String[1];
 			String file_url = request.getParameter("url");
 			//System.out.println("file_url: " + file_url);
 			file_urls[0] = file_url;
-		} 
+		}
 		else {
 			file_urls = new String[Integer.parseInt(length)];
 			String [] urls = request.getParameterValues("url");
@@ -106,25 +143,155 @@ public class SRMRequestController {
 			}
 		}
 
-			
-		System.out.println("running in production?..." + isProduction);
-		
+
+
 		if(debugFlag) {
+			System.out.println("running in production?..." + isProduction);
 			for(int i=0;i<file_urls.length;i++) {
-				System.out.println("file_url: " + i + " " + file_urls[i]);
+				System.out.println("file_url: " + i + " " + file_urls[i] + " thread_id: " + thread_id);
 			}
+		}
+
+
+		try {
+			Bestman3 bestman = Bestman3.getInstance(thread_id);
+			if(isProduction) {
+				
+				bestman.get(file_urls);
+
+				//send the response from bestman
+				//this.srm_response = this.bestman.getSrm_response();
+
+				//System.out.println("\nSRM RESPONSE\n\n" + new XmlFormatter().format(srm_response.toXML()) + "\n\n\n");
+			} else {
+				srm_response = SRMUtils.simulateSRM(file_urls);
+			}
+		} catch(Exception e) {
+			System.out.println("Exception triggered in SRMRequestController");
+			e.printStackTrace();
+		}
+
+
+		System.out.println("\n\n\nThread id: " + thread_id + " Returning...");
+
+		/*
+		if(srm_response == null) {
+			return "<srm_response>" + Utils.responseMessage + "</srm_response>";
+		} else {
+
+			//System.out.println(new XmlFormatter().format(srm_response.toXML()) + "\n");
+			return new XmlFormatter().format(srm_response.toXML()) + "\n";
+		}
+		*/
+		
+		return "done3";
+	}
+	
+	@RequestMapping(method=RequestMethod.POST, value="/srmrequest2")
+	//public ModelAndView addEmployee(@RequestBody String body) {
+	public @ResponseBody String addSRMRequest2(HttpServletRequest request,final HttpServletResponse response,String thread_id) {
+	
+		System.out.println("In srmrequest2");
+		
+		/*
+		for(Object key : request.getParameterMap().keySet() ) {
+			System.out.println("Key: " + (String) key);
+		}
+		*/
+		
+		for(Object key : request.getParameterMap().keySet() ) {
+			System.out.println("Key: " + (String) key);
+		}
+
+
+
+		//grab params
+		System.out.println("In HTTP POST: addSRMRequest");
+
+		String openid = request.getParameter("openid");
+		if(openid == null) {
+			this.openid = "jfharney";
+		} else {
+			this.openid = openid;
+		}
+
+		String length = request.getParameter("length");
+		if(length == null) {
+			length = "1";
+		}
+
+		String file_request_type = request.getParameter("file_request_type");
+		if(file_request_type == null) {
+			this.file_request_type = "http";
+			//file_request_type = "http";
+		} else if(file_request_type.equals("http")){
+			this.file_request_type = "http";
+		} else if(file_request_type.equals("gridftp")) {
+			this.file_request_type = "gridftp";
+		} else if(file_request_type.equals("globusonline")) {
+			this.file_request_type = "globusonline";
+		} else {
+			this.file_request_type = "http";
+		}
+
+
+
+		String [] file_urls = null;
+		
+		System.out.println("Length: " + length);
+		
+		if(length.equals("1")) {
+			file_urls = new String[1];
+			String file_url = request.getParameter("url");
+			//System.out.println("file_url: " + file_url);
+			file_urls[0] = file_url;
+		}
+		else {
+			file_urls = new String[Integer.parseInt(length)];
+			String [] urls = request.getParameterValues("url");
+			for(int i=0;i<urls.length;i++) {
+				file_urls[i] = urls[i];
+			}
+		}
+
+
+
+		if(debugFlag) {
+			System.out.println("running in production?..." + isProduction);
+			for(int i=0;i<file_urls.length;i++) {
+				System.out.println("file_url: " + i + " " + file_urls[i] + " thread_id: " + thread_id);
+			}
+		}
+
+
+		
+		Bestman2 bestman = Bestman2.getInstance(thread_id);
+		
+		String srm_response = "";
+		
+		try {
+			
+			
+			bestman.get(thread_id,file_urls);
+			
+			
+			
+		} catch(Exception e) {
+			
 		}
 		
 		
+		
+		/*
 		try {
 			this.bestman = new Bestman(file_urls);
 			if(isProduction) {
 				System.out.println(this.bestman.toString());
 				this.bestman.get();
-				
+
 				//send the response from bestman
 				this.srm_response = this.bestman.getSrm_response();
-				
+
 				System.out.println("\nSRM RESPONSE\n\n" + new XmlFormatter().format(srm_response.toXML()) + "\n\n\n");
 			} else {
 				srm_response = SRMUtils.simulateSRM(file_urls);
@@ -133,17 +300,149 @@ public class SRMRequestController {
 			System.out.println("Exception triggered in SRMRequestController");
 			e.printStackTrace();
 		}
+		*/
 		
-		
+
 		System.out.println("Returning...");
-			
+
+		/*
 		if(srm_response == null) {
 			return "<srm_response>" + Utils.responseMessage + "</srm_response>";
 		} else {
-			
+
+			//System.out.println(new XmlFormatter().format(srm_response.toXML()) + "\n");
+			return new XmlFormatter().format(srm_response.toXML()) + "\n";
+					
+		}
+		*/
+		
+		return "done\n";
+		
+	}
+	
+	@RequestMapping(method=RequestMethod.POST, value="/srmrequest")
+	//public ModelAndView addEmployee(@RequestBody String body) {
+	public @ResponseBody String addSRMRequest(HttpServletRequest request,final HttpServletResponse response) {
+		
+		/*
+		for(Object key : request.getParameterMap().keySet() ) {
+			System.out.println("Key: " + (String) key);
+		}
+		*/
+		
+		for(Object key : request.getParameterMap().keySet() ) {
+			System.out.println("Key: " + (String) key);
+		}
+
+
+
+		//grab params
+		System.out.println("In HTTP POST: addSRMRequest");
+
+		String openid = request.getParameter("openid");
+		if(openid == null) {
+			this.openid = "jfharney";
+		} else {
+			this.openid = openid;
+		}
+
+		String length = request.getParameter("length");
+		if(length == null) {
+			length = "1";
+		}
+
+		String file_request_type = request.getParameter("file_request_type");
+		if(file_request_type == null) {
+			this.file_request_type = "http";
+			//file_request_type = "http";
+		} else if(file_request_type.equals("http")){
+			this.file_request_type = "http";
+		} else if(file_request_type.equals("gridftp")) {
+			this.file_request_type = "gridftp";
+		} else if(file_request_type.equals("globusonline")) {
+			this.file_request_type = "globusonline";
+		} else {
+			this.file_request_type = "http";
+		}
+
+
+
+		String [] file_urls = null;
+		
+		System.out.println("Length: " + length);
+		
+		if(length.equals("1")) {
+			file_urls = new String[1];
+			String file_url = request.getParameter("url");
+			//System.out.println("file_url: " + file_url);
+			file_urls[0] = file_url;
+		}
+		else {
+			file_urls = new String[Integer.parseInt(length)];
+			String [] urls = request.getParameterValues("url");
+			for(int i=0;i<urls.length;i++) {
+				file_urls[i] = urls[i];
+			}
+		}
+
+
+
+		if(debugFlag) {
+			System.out.println("running in production?..." + isProduction);
+			for(int i=0;i<file_urls.length;i++) {
+				System.out.println("file_url: " + i + " " + file_urls[i]);
+			}
+		}
+
+
+		try {
+			this.bestman = new Bestman(file_urls);
+			if(isProduction) {
+				System.out.println(this.bestman.toString());
+				this.bestman.get();
+
+				//send the response from bestman
+				this.srm_response = this.bestman.getSrm_response();
+
+				System.out.println("\nSRM RESPONSE\n\n" + new XmlFormatter().format(srm_response.toXML()) + "\n\n\n");
+			} else {
+				srm_response = SRMUtils.simulateSRM(file_urls);
+			}
+		} catch(Exception e) {
+			System.out.println("Exception triggered in SRMRequestController");
+			e.printStackTrace();
+		}
+
+
+		System.out.println("Returning...");
+
+		if(srm_response == null) {
+			return "<srm_response>" + Utils.responseMessage + "</srm_response>";
+		} else {
+
 			//System.out.println(new XmlFormatter().format(srm_response.toXML()) + "\n");
 			return new XmlFormatter().format(srm_response.toXML()) + "\n";
 		}
+		
+	}
+	
+	
+	public synchronized void queryHPSS(String thread_id) {
+
+		System.out.println("thread_id: " + thread_id + " entering queryHPSS");
+		
+		if(firstThread) {
+			firstThread = false;
+			
+			Thread.currentThread();
+			try {
+				Thread.sleep(10000);
+			} catch(InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println("thread_id: " + thread_id + " exiting queryHPSS");
+		
 		
 	}
 	
