@@ -1,23 +1,37 @@
 #!/bin/bash
 
 source esg-stager
+function clean() {
+    [[ ${#1} -lt 5 ]] && return
+    if [[ -e "$1" ]]; then
+        echo "Removing $1"
+        rm -rf "$1"
+    fi
+}
 
 while getopts Gb:c: flag; do
     case $flag in
         b)
-            local bestman_path=$OPTARG
+            bestman_path=$OPTARG
             echo "BESTMAN_PATH = $bestman_path"
         ;;
         c)
-            local hpss_proxy_certificate_location=$OPTARG
+            hpss_proxy_certificate_location=$OPTARG
             echo "hpss_proxy_certificate_location = $hpss_proxy_certificate_location"
         ;;
         G)
             gridftp_restart=1
             echo "Will restart gridftp"
         ;;
+        \?)
+            exit 1
+        ;;
     esac
 done
+
+clean $bestman_path/bestman2
+clean /tmp/bestman2-2.3.0.tar.gz
+clean /usr/local/src/esgf-stager
 
 cmd="setup_stager"
 if [[ $bestman_path ]]; then
