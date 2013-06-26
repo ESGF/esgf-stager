@@ -1,4 +1,4 @@
-package org.esgf.stager;
+package org.esgf.legacystager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +17,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 //import org.esgf.singleton2.Bestman;
-import org.esgf.singleton2.GetBestman;
+import org.esgf.stager.GetBestman;
 import org.esgf.stager.utils.Utils;
 import org.esgf.stager.utils.XmlFormatter;
 import org.springframework.mock.web.MockHttpServletRequest;

@@ -1,10 +1,8 @@
-package org.esgf.singleton2;
+package org.esgf.legacystager;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import org.esgf.stager.SRMResp;
 
 public class SRMUtils {
 

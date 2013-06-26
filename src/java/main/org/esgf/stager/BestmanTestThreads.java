@@ -1,4 +1,4 @@
-package org.esgf.singleton2;
+package org.esgf.stager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +15,7 @@ public class BestmanTestThreads {
 	
 	private static String NUM_THREADS = "3";
 	
-	private static String THREAD1_NUM_FILES_REQUESTED = "2";
-	private static String THREAD2_NUM_FILES_REQUESTED = "2";
+	private static String NUM_FILES_REQUESTED = "2";
 	
 	public static void main(String[] args){
 
@@ -40,69 +39,41 @@ public class BestmanTestThreads {
 		
 		List<String> urlList = getURLList();
 
-		System.out.println("size: " + urlList.size());
 		
 		Random randNum = new Random();
 		
-		String [] thread_urls = new String[Integer.parseInt(NUM_THREADS)];
+		//String [][] thread_urls = new String[Integer.parseInt(NUM_THREADS)][Integer.parseInt(NUM_FILES_REQUESTED)];
 		int numFilesRequest = 2;
 		for(int i=0;i<Integer.parseInt(NUM_THREADS);i++) {
 		
-				//thread_urls[i] = new String[2];
+			String [] thread_urls = new String [Integer.parseInt(NUM_FILES_REQUESTED)];
+			for(int j=0;j<Integer.parseInt(NUM_FILES_REQUESTED);j++) {
 				
+				int num = randNum.nextInt(40);
+				thread_urls[j] = urlList.get(num);
+			
+			}
+
+			threadMockRequest[i].addParameter("url", thread_urls);
+			threadMockRequest[i].addParameter("length", Integer.toString(thread_urls.length));
 		
 		}
-		/*
+		
+		//call each thread
 		for(int i=0;i<Integer.parseInt(NUM_THREADS);i++) {
-			thread_urls[i] = new String [numFilesRequest];
+		
+			System.out.println("Running thread: " + i);
+			for(int j=0;j<Integer.parseInt(NUM_FILES_REQUESTED);j++) {
+				System.out.println("\turl: " + threadMockRequest[i].getParameterValues("url")[j]);
+			}
+			
+			Runnable getBestman = new GetBestman(threadMockRequest[i],threadMockResponse[i]);
+			new Thread(getBestman).start();
+			
 		}
-		*/
-		/*
-		String [] thread1_urls = new String [Integer.parseInt(THREAD1_NUM_FILES_REQUESTED)]; 
-		String [] thread2_urls = new String [Integer.parseInt(THREAD2_NUM_FILES_REQUESTED)]; 
-		*/
-		/*
-		for(int i=0;i<Integer.parseInt(THREAD1_NUM_FILES_REQUESTED);i++) {
-			int num = randNum.nextInt(40);
-			thread1_urls[i] = urlList.get(num);
-		}
-		thread1MockRequest.addParameter("url", thread1_urls);
-		thread1MockRequest.addParameter("length", Integer.toString(thread1_urls.length));
 		
 		
-		for(int i=0;i<Integer.parseInt(THREAD2_NUM_FILES_REQUESTED);i++) {
-			int num = randNum.nextInt(40);
-			thread2_urls[i] = urlList.get(num);
-		}
-		thread2MockRequest.addParameter("url", thread2_urls);
-		thread2MockRequest.addParameter("length", Integer.toString(thread2_urls.length));
 		
-		//thread 1
-        Runnable getBestman = new GetBestman(thread1MockRequest,thread1MockResponse);
-
-        //thread 2
-        Runnable getBestman2 = new GetBestman(thread2MockRequest,thread2MockResponse);
-
-        new Thread(getBestman).start();
-        new Thread(getBestman2).start();
-        */
-/*
-		mockRequest.addParameter("url", url);
-		mockRequest.addParameter("length", length);
-		
-		//thread 1
-        Runnable getBestman = new GetBestman(mockRequest,mockResponse);
-
-        //thread 2
-        Runnable getBestman2 = new GetBestman(mockRequest,mockResponse);
-        
-        //thread 3
-        Runnable getBestman3 = new GetBestman(mockRequest,mockResponse);
-                 
-        // Call for the code in the method run to execute
-                 
-        new Thread(getBestman3).start();
-*/        
     }
 	
 	public static List<String> getURLList() {

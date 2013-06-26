@@ -1,4 +1,4 @@
-package org.esgf.singleton2;
+package org.esgf.stager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,7 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.esgf.stager.SRMUtils;
+import org.esgf.legacystager.SRMUtils;
 
 public class BestmanServerProperties {
 
@@ -17,7 +17,7 @@ public class BestmanServerProperties {
 	//defaults
 	private String uid="";
 	private String logPath="/tmp/esg-srm.log";
-    private String log4jlocation="";
+    private String log4jlocation="/tmp/bestman.log";
     private String storageInfo="";
     private String fileType="volatile";
     private String retentionPolicy="replica";

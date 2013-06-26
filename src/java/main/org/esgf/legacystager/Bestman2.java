@@ -1,11 +1,10 @@
-package org.esgf.stager;
+package org.esgf.legacystager;
 
 import gov.lbl.srm.client.wsdl.SRMRequest;
 import gov.lbl.srm.client.wsdl.SRMRequestStatus;
 import gov.lbl.srm.client.wsdl.SRMServer;
 
-import org.esgf.singleton2.Bestman;
-import org.esgf.singleton2.BestmanServerProperties;
+import org.esgf.stager.BestmanServerProperties;
 
 public class Bestman2 {
 

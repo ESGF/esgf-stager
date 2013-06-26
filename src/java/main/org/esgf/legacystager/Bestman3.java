@@ -1,12 +1,11 @@
-package org.esgf.singleton2;
+package org.esgf.legacystager;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.esgf.singleton2.Bestman;
-import org.esgf.singleton2.BestmanServerProperties;
+import org.esgf.stager.BestmanServerProperties;
 
 import gov.lbl.srm.StorageResourceManager.TStatusCode;
 import gov.lbl.srm.client.wsdl.FileStatus;
@@ -23,7 +22,7 @@ public class Bestman3 {
 
 	
 	//private SRMReq srm_request;
-	//private SRMResp srm_response;
+	private SRMResp srm_response;
 	
 	private String thread_id;
 

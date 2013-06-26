@@ -1,4 +1,4 @@
-package org.esgf.singleton2;
+package org.esgf.stager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +17,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 //import org.esgf.singleton2.Bestman;
-import org.esgf.singleton2.GetBestman;
+import org.esgf.stager.GetBestman;
 import org.esgf.stager.utils.Utils;
 import org.esgf.stager.utils.XmlFormatter;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -42,8 +42,6 @@ public class SynchronizedSRMRequestController {
 	
 	private static boolean debugFlag = true;
 	
-	private Bestman bestman;
-	
 	private String file_request_type;
 	private String openid;
 	
@@ -53,23 +51,17 @@ public class SynchronizedSRMRequestController {
 	
 	@RequestMapping(method=RequestMethod.POST, value="/synchronizedsrmrequest")
 	//public ModelAndView addEmployee(@RequestBody String body) {
-	public @ResponseBody String addSRMRequest3(HttpServletRequest request,final HttpServletResponse response,String thread_id) {
-	
-	
-		/*
-		for(Object key : request.getParameterMap().keySet() ) {
-			System.out.println("Key: " + (String) key);
-		}
-		*/
+	public @ResponseBody String addSynchronizedSRMRequest(HttpServletRequest request,
+														  final HttpServletResponse response,
+														  String thread_id) {
+		
 		
 		for(Object key : request.getParameterMap().keySet() ) {
-			System.out.println("Key: " + (String) key);
+			//System.out.println("Key: " + (String) key);
 		}
 
-
-
 		//grab params
-		System.out.println("In HTTP POST: addSRMRequest3 for thread_id: " + thread_id + "\n\n\n");
+		System.out.println("Entering addSynchronizedSRMRequest for thread_id: " + thread_id + "\n");
 
 		String openid = request.getParameter("openid");
 		if(openid == null) {
@@ -117,20 +109,24 @@ public class SynchronizedSRMRequestController {
 		}
 
 
-
+		/*
 		if(debugFlag) {
 			System.out.println("running in production?..." + isProduction);
 			for(int i=0;i<file_urls.length;i++) {
 				System.out.println("file_url: " + i + " " + file_urls[i] + " thread_id: " + thread_id);
 			}
 		}
+		*/
+		
 
 
+		String response_message = "";
+		
 		try {
-			Bestman3 bestman = Bestman3.getInstance(thread_id);
+			Bestman bestman = Bestman.getInstance(thread_id);
 			if(isProduction) {
 				
-				bestman.get(file_urls);
+				response_message = bestman.get(file_urls,thread_id);
 
 				//send the response from bestman
 				//this.srm_response = this.bestman.getSrm_response();
@@ -145,8 +141,9 @@ public class SynchronizedSRMRequestController {
 		}
 
 
-		System.out.println("\n\n\nThread id: " + thread_id + " Returning...");
-
+		//System.out.println("\n\n\nThread id: " + thread_id + " Returning...");
+		//System.out.println("response_message\n" + response_message + "\n\n");
+		
 		/*
 		if(srm_response == null) {
 			return "<srm_response>" + Utils.responseMessage + "</srm_response>";
@@ -157,7 +154,7 @@ public class SynchronizedSRMRequestController {
 		}
 		*/
 		
-		return "done3";
+		return response_message;
 	}
 	
 	

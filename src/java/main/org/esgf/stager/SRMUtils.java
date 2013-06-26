@@ -4,15 +4,20 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.esgf.legacystager.SRMResp;
+
 public class SRMUtils {
+	
+	public static int MAX_URL_DISPLAY = 1;
 
 	public static String THREDDS_DATAROOT = "/thredds/fileServer/esg_srm_dataroot";
 	
 	public static String SRM_CACHE_REPLACE = "/SRMTemp/";
 
     public static String srmAPIURL = "http://localhost:8080/esgf-stager/service/srmrequest?";
-	
-    public static String RESPONSE_MESSAGE = "Request Completed";
+
+    public static String RESPONSE_MESSAGE_SUCCESS = "Request Completed";
+    public static String RESPONSE_MESSAGE_FAILURE = "Request Failed to Complete";
     
     public static String [] gridftp2httpArr(String [] grid_ftp_arr) {
     	String [] http_arr = new String[grid_ftp_arr.length];

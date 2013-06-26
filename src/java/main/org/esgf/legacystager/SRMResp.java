@@ -1,4 +1,4 @@
-package org.esgf.stager;
+package org.esgf.legacystager;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
