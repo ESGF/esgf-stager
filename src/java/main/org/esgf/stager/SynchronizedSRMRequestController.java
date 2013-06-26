@@ -153,7 +153,7 @@ public class SynchronizedSRMRequestController {
 			return new XmlFormatter().format(srm_response.toXML()) + "\n";
 		}
 		*/
-		
+		System.out.println(new XmlFormatter().format(response_message) + "\n");
 		return response_message;
 	}
 	
