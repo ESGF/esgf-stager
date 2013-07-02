@@ -131,6 +131,7 @@ setup_bestman() {
     # configure fails because of not finding axis 1.4. Do we need to fetch
     #   that from somewhere?
     runcmd cd ${bm_path}/setup
+    export CLASSPATH=`find ${bm_path}/lib -name "*.jar" | xargs echo | sed -e "s/ /:/g"`
     ./configure
 
 #     # 4 - set the configuration parameters in BESTMAN2_HOME/conf/bestman2.rc and BESTMAN2_HOME/etc/bestman2 using the inputs
