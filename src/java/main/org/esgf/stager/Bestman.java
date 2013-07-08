@@ -110,7 +110,7 @@ public class Bestman {
 	    	
 	    	for(int i=0;i<file_urls.length;i++) {
 	    		//System.out.println("i: " + i);
-	    		//System.out.println("\t" + file_urls[i]);
+	    		System.out.println("\tfile: " + i + " " + file_urls[i]);
 	    		response_file_urls[i] = SRMUtils.transformServerName(file_urls[i]);
 	    	}
 	    	

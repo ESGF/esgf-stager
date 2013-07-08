@@ -19,6 +19,11 @@ public class SRMUtils {
     public static String RESPONSE_MESSAGE_SUCCESS = "Request Completed";
     public static String RESPONSE_MESSAGE_FAILURE = "Request Failed to Complete";
     
+    
+    
+    
+    
+    
     public static String [] gridftp2httpArr(String [] grid_ftp_arr) {
     	String [] http_arr = new String[grid_ftp_arr.length];
 
@@ -93,6 +98,7 @@ public class SRMUtils {
 		return extractedFile;
 	}
 	
+    
 	//input
 	//srm://esg2-sdnl1.ccs.ornl.gov:46790/srm/v2/server?SFN=mss://esg2-sdnl1.ccs.ornl.gov//proj/cli049/UHRGCS/ORNL/CESM1/t341f02.FAMIPr/atm/hist/t341f02.FAMIPr.cam2.h0.1978-09.nc
 	//output
@@ -171,8 +177,8 @@ public class SRMUtils {
 		
 		String gridftp = "gsiftp://esg.ccs.ornl.gov//lustre/esgfs/SRMTemp/shared/V.0.0-730290723/t341f02.FAMIPr.cam2.h0.1978-10.nc";
 		
-		String ftp = gridftp2http(gridftp);
-		System.out.println("ftp: " + ftp);
+		//String ftp = gridftp2http(gridftp);
+		//System.out.println("ftp: " + ftp);
 		/*
 		String [] srm_urls = new String [1];
 		

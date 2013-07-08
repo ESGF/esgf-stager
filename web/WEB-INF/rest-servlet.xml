@@ -8,8 +8,14 @@
 		http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
 	<!-- <context:component-scan base-package="dw.spring3.rest.controller" /> --> 
+	
 	<context:component-scan base-package="org.esgf.stager" />
+	
+	  
 	<context:component-scan base-package="org.esgf.singleton2" />
+	
+	
+	
 	<!-- To enable @RequestMapping process on type level and method level -->
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
@@ -30,7 +36,9 @@
 	</bean>
  -->
 
-<!--  
+ 
+ 	<!-- NOTE: THIS IS THE CORRECT LOCATION FOR CONTROLLER CODE -->
+ 
 	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
 		<property name="mediaTypes">
 		    <map>
@@ -49,9 +57,9 @@
 		    </list>
 		</property>
 	</bean>
--->	
+ <!--	
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver" />
-
+-->
 <!--  
 	<bean id="employeeController" class="dw.spring3.rest.controller.EmployeeController">
 		<property name="employeeDS" ref="employeeDS" />

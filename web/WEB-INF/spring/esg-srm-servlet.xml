@@ -35,9 +35,30 @@
     
   
 
-    <bean id="viewResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver" />
+  <!--   
+	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="mediaTypes">
+		    <map>
+		        <entry key="xml" value="application/xml"/>
+		        <entry key="html" value="text/html"/>
+		    </map>
+		</property>
+		<property name="viewResolvers">
+		    <list>
+		        <bean class="org.springframework.web.servlet.view.BeanNameViewResolver"/>
+		        <bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+					<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+					<property name="prefix" value="/WEB-INF/jsp/"/>
+					<property name="suffix" value=".jsp"/>
+				</bean>
+		    </list>
+		</property>
+	</bean>
+
+
+--> 
     
-    
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver" />
     
     
 <!--  
