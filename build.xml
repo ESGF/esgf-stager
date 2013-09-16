@@ -123,10 +123,10 @@ Builds the project via ant (obviously).
     -->
   
   <target name="-pre-init" unless="build.master">
-    <property name="build.compiler" value="javac1.6" /> 
-    <property name="ant.build.javac.source" value="1.6" />
-    <property name="ant.build.javac.target" value="1.6" />
-    <property name="ant.java.version" value="1.6" />
+    <property name="build.compiler" value="javac1.7" /> 
+    <property name="ant.build.javac.source" value="1.7" />
+    <property name="ant.build.javac.target" value="1.7" />
+    <property name="ant.java.version" value="1.7" />
     <property name="build.compiler.emacs" value="true" /> 
     <echo message="set build.compiler to ${build.compiler}"/>
   </target>
