@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>ESGF: esgf-stager</title>
+    <!-- the syle sheet link  -->
+    <link rel='stylesheet' href='http://esgf.org/styles.css' type='text/css'>
+    <!-- favuorite icon - needs to have the http://full_path link  -->
+    <link rel="icon" type="image/png" href="http://esgf.org/images/esgf-favicon.png">
+    
+    <!-- keywords for search  engines  -->
+    <meta name="keywords" content="earth systems grid, go-essp, esgf, distributed computing, distributed storage, climage science">
+    <meta name="description" content="A distributed database for structured data.">		
+    <meta http-equiv='Content-Type' content='text/html;charset=utf-8'> 
+  </head>
+  
+  <!-- the page code starts here -->    
+  <body>
+    <div >  <!-- body -->    
+<a href="https://github.com/ESGF/esgf-stager"><img style="position:absolute;top:0;right:0;border:0;" width="149" height="149" src="images/forkme.png" alt="Fork me on GitHub"></a>
+      <!-- header starts here -->
+      <div id="header" style="overflow: hidden">
+        <!-- image floats tot the right -->
+        <div style='float: right; margin-right: 100px'>
+	  <img src='images/logo.png' height="70" >
+        </div>
+        
+        <div id='logo' style='float: left; margin-right: 20px; margin-left: -10px'> 
+          <a href="http://esgf.org/"><img src='http://esgf.org/images/esgf-logo.png' width="70" height="70" border="0"></a>
+        </div>
+	
+	<div>  <!-- inside header -->   
+	  <div class="title">ESGF</div>
+	  <div class="subtitle">Earth System Grid Federation</div>
+          <!-- projects top navigation -->  
+	  <div class="projects">  <!-- projects -->   
+            <a href="http://esgf.org/esgf-installer-site/">installer</a> &middot;
+            <a href="http://esgf.org/esgf-node-manager-site/">node-manager</a> &middot;
+	    <a href="http://esgf.org/esg-publisher-site/">publisher</a> &middot;
+	    <a href="http://esgf.org/esgf-idp-site/">idp</a> &middot;
+	    <a href="http://esgf.org/esg-orp-site/">orp</a> &middot;
+	    <a href="http://esgf.org/esgf-security-site/">security</a> &middot;
+	    <a href="http://esgf.org/esg-search-site/">search</a> &middot; 
+	    <!-- <a href="http://esgf.org/esg-script-gen-site/">script-gen</a> &middot; -->
+	    <a href="http://esgf.org/esgf-drslib-site/">drslib</a> &middot;
+	    <a href="http://esgf.org/esgf-stager-site/"><b>stager</b></a> &middot;
+	    <a href="http://esgf.org/esgf-fetcher-site/">fetcher</a> &middot;
+	    <a href="http://esgf.org/esgf-toolbox-site/">toolbox</a> &middot;
+	    <a href="http://esgf.org/projects.html">...</a>
+          </div> <!-- projects -->    
+	  
+        </div>  <!-- inside header -->
+      </div>  <!-- header -->
+      
+      <!-- left side navigation bar starts here -->
+      <div class="lsidebar">  <!-- lsidebar -->
+	<ul>
+	  <li>   <a href="http://esgf.org/">esgf</a> </li>
+          <li>   <a href="design.html">design</a> </li>
+          <li>   <a href="">download</a> </li>
+          <li>   <a href="quickstart.html">quickstart</a>  </li>
+          <li>   <a href="developer.html">developer&nbsp;info</a> </li>
+          <li>   <a href="performance.html">performance</a> </li>
+          <li>   <a href="http://esgf.org/gitweb/?p=esgf-stager.git;a=summary">repo</a> </li>
+          <li>   <a href="http://cmip2.dkrz.de/hudson/job/Stager/lastBuild/javadoc/">code docs</a> </li>
+          <li>   <a href="http://cmip2.dkrz.de/hudson/job/Stager/doclinks/1/esgf-esg-stager-default.html">dep-report</a> </li>
+          <li>   <a href="http://cmip2.dkrz.de/hudson/job/Stager/lastBuild/testReport/">unit tests</a> </li>
+          <li>   <a href="http://cmip2.dkrz.de/hudson/job/Stager/lastBuild/cobertura/">coverage</a> </li>
+          <li>   <a href="http://cmip2.dkrz.de/hudson/job/Stager/">ci</a> </li>
+          <li>   <a href="https://is-enes-wiki.dkrz.de/farm/SA2/JRA4%20Collaboration/ESGDataNode/InstallationFAQ">faq</a> </li>
+          <li>   <a href="mailing_list.html">mailing list</a> </li>
+          <li>   <a href="/bugzilla">bugs</a>  </li>
+          <li>   <a href="https://is-enes-wiki.dkrz.de/farm/SA2/JRA4">wiki</a>   </li>
+	  <li>   <a href="http://esgf.org/blog" target="_blank">blog</a> </li>
+        </ul>
+        
+	
+      </div>   <!-- lsidebar -->
+      
+      <!-- main text comes here -->
+      <div class='content'>
+	
+	<!-- make titles to be <h3> tags -->
+	<h3>Stager for ESGF</h3>
+	The Stager provides the means to transparently access files located at a
+	remote system. Remote files are cached locally preserving the directory
+	structure from the remote structure.
+	<h3>Implementation</h3>
+	The current implementation uses a Java web Filter for intercepting the
+	file requests targeted at servlets running locally. This calls are handled
+	differently depending on the user-agent attribute from the http request header.
+	<br/>
+	If the request was started from within a browser, the user is redirected to a 
+	"waiting page" from where it will be automatically redirected to the original
+	servlet when the file is ready.<br/>
+	In case the request was started by a tool, the request will just block until
+	the file is available<br/>
+	The file retrieval will be triggered only once and in cache the file is already
+	in the cache the filter will return	immediately allowing the call to proceed 
+	normally without any delay. This call is logged to optimize the cache-cleaning
+	mechanism.
+	 
+
+	
+      </div> <!-- content -->
+      
+      <br class="clearfloat" />
+      <!-- footer section here -->
+      <div id="footer"> 
+	<div >  
+	  <div class="projects"> 
+	    <a href="http://www-pcmdi.llnl.gov" target="_other">PCMDI</a> &amp;
+	    <a href="http://www.mpimet.mpg.de/" target="_other">MPI-M</a> &middot;
+	    <a href="http://cmip-pcmdi.llnl.gov/cmip5/" target="_other">CMIP5</a> &middot; 
+	    <a href="http://www.mad.zmaw.de/projects-at-md/ipcc-data/" target="_other">IPCC@ZMAW</a> &middot;
+	    <a href="http://www.dkrz.de/" target="_other">DKRZ</a> &middot;
+            <a href="https://www.llnl.gov/disclaimer.html" target="_other">Privacy &amp; Legal Notice</a> &middot;
+            <a  > LLNL-WEB-460643 &nbsp;&nbsp;&nbsp; </a &middot;></div>
+      </div>
+	</div>
+      </div>    <!-- footer -->      
+      
+    </div> <!-- body -->    
+  </body>
+</html>
